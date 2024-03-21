@@ -1,8 +1,8 @@
 #include "mlx90614.h"
 
 /*******************************************************************************
-* ������: SMBus_Init
-* ����: SMBus��ʼ��
+* 函数名: SMBus_Init
+* 功能: SMBus初始化
 * Input          : None
 * Output         : None
 * Return         : None
@@ -10,8 +10,9 @@
 void SMBus_Init()
 {
     GPIO_InitTypeDef    GPIO_InitStructure;
-    /* Enable SMBUS_PORT clocks */
-    Init_GPIO_Clock(SMBUS_PORT);
+	/* Enable SMBUS_PORT clocks */
+	Init_GPIO_Clock(SMBUS_PORT);
+    /*配置SMBUS_SCK、SMBUS_SDA为集电极开漏输出*/
     GPIO_InitStructure.GPIO_Pin = SMBUS_SCK | SMBUS_SDA;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -21,8 +22,8 @@ void SMBus_Init()
     SMBUS_SDA_H();
 }
 /*******************************************************************************
-* ������: MLX90614MLX90614 ����ʼλ SMBus_StartBit
-* ����  : MLX90614 ����ʼλ ������ʼλ
+* 函数名: MLX90614MLX90614 发起始位 SMBus_StartBit
+* 功能  : MLX90614 发起始位 产生起始位
 * Input          : None
 * Output         : None
 * Return         : None
@@ -37,14 +38,14 @@ void SMBus_StartBit(void)
     SMBUS_SDA_L();		// Clear SDA line
     SMBus_Delay(5);	    // Hold time after (Repeated) Start
     // Condition. After this period, the first clock is generated.
-    //(Thd:sta=4.0us min)��SCK=1ʱ����⵽SDA��1��0��ʾͨ�ſ�ʼ���½��أ�
+    //(Thd:sta=4.0us min)在SCK=1时，检测到SDA由1到0表示通信开始（下降沿）
     SMBUS_SCK_L();	    // Clear SCL line
     SMBus_Delay(5);	    // Wait a few microseconds
 }
 
 /*******************************************************************************
-* ������: SMBus_StopBit
-* ����: MLX90614 ��ֹͣλ STOP condition on SMBus
+* 函数名: SMBus_StopBit
+* 功能: MLX90614 发停止位 STOP condition on SMBus
 * Input          : None
 * Output         : None
 * Return         : None
@@ -61,8 +62,8 @@ void SMBus_StopBit(void)
 }
 
 /*******************************************************************************
-* ������: SMBus_SendByte
-* ����: MLX90614 ����һ���ֽ� Send a byte on SMBus
+* 函数名: SMBus_SendByte
+* 功能: MLX90614 发送一个字节 Send a byte on SMBus
 * Input          : Tx_buffer
 * Output         : None
 * Return         : None
@@ -75,24 +76,24 @@ u8 SMBus_SendByte(u8 Tx_buffer)
 
     for(Bit_counter=8; Bit_counter; Bit_counter--)
     {
-        if (Tx_buffer&0x80)//������λΪ1
+        if (Tx_buffer&0x80)//如果最高位为1
         {
-            bit_out=1;   // �����λ��1
+            bit_out=1;   // 把最高位置1
         }
-        else  //������λΪ0
+        else  //如果最高位为0
         {
-            bit_out=0;  // �����λ��0
+            bit_out=0;  // 把最高位置0
         }
-        SMBus_SendBit(bit_out);	// �����λ���ͳ�ȥ
-        Tx_buffer<<=1;// ����һλ�����λ�Ƴ�ȥ�ȴ���һ�����λ��ѭ��8�Σ�ÿ�ζ������λ���Ϳɰ�һ���ֽڷ���ȥ��
+        SMBus_SendBit(bit_out);	// 把最高位发送出去
+        Tx_buffer<<=1;// 左移一位把最高位移出去等待下一个最高位，循环8次，每次都发最高位，就可把一个字节发出去了
     }
     Ack_bit=SMBus_ReceiveBit();
     return	Ack_bit;
 }
 
 /*******************************************************************************
-* ������: SMBus_SendBit
-* ����: MLX90614 ����һ��λ Send a bit on SMBus 82.5kHz
+* 函数名: SMBus_SendBit
+* 功能: MLX90614 发送一个位 Send a bit on SMBus 82.5kHz
 * Input          : bit_out
 * Output         : None
 * Return         : None
@@ -127,8 +128,8 @@ u8 SMBus_ReceiveBit(void)
 {
     u8 Ack_bit;
 
-    SMBUS_SDA_H();          //���ſ��ⲿ������������������
-	  SMBus_Delay(2);			// High Level of Clock Pulse
+    SMBUS_SDA_H();          //引脚靠外部电阻上拉，当作输入
+	SMBus_Delay(2);			// High Level of Clock Pulse
     SMBUS_SCK_H();			// Set SCL line
     SMBus_Delay(5);			// High Level of Clock Pulse
     if (SMBUS_SDA_PIN())
@@ -146,8 +147,8 @@ u8 SMBus_ReceiveBit(void)
 }
 
 /*******************************************************************************
-* ������: SMBus_ReceiveByte
-* ����: Receive a byte on SMBus ��SMBus�н���һ���ֽڵ�����
+* 函数名: SMBus_ReceiveByte
+* 功能: Receive a byte on SMBus 从SMBus中接受一个字节的数据
 * Input          : ack_nack
 * Output         : None
 * Return         : RX_buffer
@@ -162,21 +163,21 @@ u8 SMBus_ReceiveByte(u8 ack_nack)
         if(SMBus_ReceiveBit())// Get a bit from the SDA line
         {
             RX_buffer <<= 1;// If the bit is HIGH save 1  in RX_buffer
-            RX_buffer |=0x01;//���Ack_bit=1�����յ�Ӧ���ź�1��0000 0001 ���л����㣬ȷ��Ϊ1
+            RX_buffer |=0x01;//如果Ack_bit=1，把收到应答信号1与0000 0001 进行或运算，确保为1
         }
         else
         {
             RX_buffer <<= 1;// If the bit is LOW save 0 in RX_buffer
-            RX_buffer &=0xfe;//���Ack_bit=1�����յ�Ӧ���ź�0��1111 1110 ���������㣬ȷ��Ϊ0
+            RX_buffer &=0xfe;//如果Ack_bit=1，把收到应答信号0与1111 1110 进行与运算，确保为0
         }
     }
-    SMBus_SendBit(ack_nack);// Sends acknowledgment bit ��Ӧ���źŷ���ȥ�����1���ͽ�����һ��ͨ�ţ����Ϊ0�����Ͱݰ���
+    SMBus_SendBit(ack_nack);// Sends acknowledgment bit 把应答信号发出去，如果1，就进行下一次通信，如果为0、，就拜拜了
     return RX_buffer;
 }
 
 /*******************************************************************************
-* ������: SMBus_Delay
-* ����: ��ʱ  һ��ѭ��Լ1us
+* 函数名: SMBus_Delay
+* 功能: 延时  一次循环约1us
 * Input          : time
 * Output         : None
 * Return         : None
@@ -191,12 +192,13 @@ void SMBus_Delay(u16 time)
 }
 
 
+
 /*******************************************************************************
- * ������: SMBus_ReadMemory
- * ����: READ DATA FROM RAM/EEPROM  ��RAM��EEPROM�ж�ȡ����
+ * 函数名: SMBus_ReadMemory
+ * 功能: READ DATA FROM RAM/EEPROM  从RAM和EEPROM中读取数据
  * Input          : slaveAddress, command
  * Return         : Data
- * SMBus_ReadMemory(0x00, 0x07) 0x00 ��ʾIIC�豸�Ĵӵ�ַ ��0x07����Ĵ�����ʼ��ȡ
+ * SMBus_ReadMemory(0x00, 0x07) 0x00 表示IIC设备的从地址 从0x07这个寄存器开始读取
 *******************************************************************************/
 u16 SMBus_ReadMemory(u8 slaveAddress, u8 command)
 {
@@ -209,7 +211,7 @@ u16 SMBus_ReadMemory(u8 slaveAddress, u8 command)
     u8 ErrorCounter;	// Defines the number of the attempts for communication with MLX90614
 
     ErrorCounter=0x00;	// Initialising of ErrorCounter
-	slaveAddress <<= 1;	//2-7λ��ʾ�ӻ���ַ �ӻ���ַ����һλ���Ѷ�дλ�ճ���
+	slaveAddress <<= 1;	//2-7位表示从机地址 从机地址左移一位，把读写位空出来
 	
     do
     {
@@ -222,7 +224,7 @@ repeat:
         }
 
         SMBus_StartBit();				//Start condition
-        if(SMBus_SendByte(slaveAddress))//Send SlaveAddress ���λWr=0��ʾ������д����
+        if(SMBus_SendByte(slaveAddress))//Send SlaveAddress 最低位Wr=0表示接下来写命令
         {
             goto	repeat;			    //Repeat comunication again
         }
@@ -232,7 +234,7 @@ repeat:
         }
 
         SMBus_StartBit();					//Repeated Start condition
-        if(SMBus_SendByte(slaveAddress+1))	//Send SlaveAddress ���λRd=1��ʾ������������
+        if(SMBus_SendByte(slaveAddress+1))	//Send SlaveAddress 最低位Rd=1表示接下来读数据
         {
             goto	repeat;             	//Repeat comunication again
         }
@@ -248,7 +250,7 @@ repeat:
         arr[2] = DataL;				//
         arr[1] = DataH;				//
         arr[0] = 0;					//
-        PecReg=PEC_Calculation(arr);//Calculate CRC ����У��
+        PecReg=PEC_Calculation(arr);//Calculate CRC 数据校验
     }
     while(PecReg != Pec);//If received and calculated CRC are equal go out from do-while{}
 
@@ -257,16 +259,16 @@ repeat:
 }
 
 /*******************************************************************************
-* ������: PEC_calculation
-* ���� : ����У��
+* 函数名: PEC_calculation
+* 功能 : 数据校验
 * Input          : pec[]
 * Output         : None
 * Return         : pec[0]-this byte contains calculated crc value
 *******************************************************************************/
 u8 PEC_Calculation(u8 pec[])
 {
-    u8 	crc[6];//��Ŷ���ʽ
-    u8	BitPosition=47;//��������������λ��6*8=48 ���λ����47λ
+    u8 	crc[6];//存放多项式
+    u8	BitPosition=47;//存放所有数据最高位，6*8=48 最高位就是47位
     u8	shift;
     u8	i;
     u8	j;
@@ -339,8 +341,8 @@ u8 PEC_Calculation(u8 pec[])
 }
 
  /*******************************************************************************
- * ������: SMBus_ReadTemp
- * ����: ���㲢�����¶�ֵ
+ * 函数名: SMBus_ReadTemp
+ * 功能: 计算并返回温度值
  * Return         : SMBus_ReadMemory(0x00, 0x07)*0.02-273.15
 *******************************************************************************/
 float SMBus_ReadTemp(void)
