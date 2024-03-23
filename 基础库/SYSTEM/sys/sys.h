@@ -63,7 +63,32 @@
 
 #define PGout(n)   BIT_ADDR(GPIOG_ODR_Addr,n)  //输出 
 #define PGin(n)    BIT_ADDR(GPIOG_IDR_Addr,n)  //输入
+//-------------------------------------------------------------------------
+//为了避免出现引脚匹配错误的问题，针对以下接口进行重新设计封装，设计了一套新的接口
 
+//将PIN转化为引脚数字，比如PIN_12转化为12
+#define PIN2NUMBER(pin) (31 - __builtin_clz(pin))
+
+#define PORT_ODR_Addr(port)    (((uint32_t)port)+12)
+#define PORT_IDR_Addr(port)    (((uint32_t)port)+8)
+
+//将某个引脚设置为输出，适用方法PinOut(GPIOA,GPIO_PIN1)将A1引脚设置为输出
+#define PinOut(port,pin) BIT_ADDR(PORT_ODR_Addr(port),PIN2NUMBER(pin))
+#define PinIn(port,pin) BIT_ADDR(PORT_IDR_Addr(port),PIN2NUMBER(pin))
+
+#define INIT_GPIO_CLOCK(GPIOx) \
+    if (GPIOx == GPIOA) { \
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE); \
+    } else if (GPIOx == GPIOB) { \
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE); \
+    } else if (GPIOx == GPIOC) { \
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE); \
+    } else if (GPIOx == GPIOD) { \
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE); \
+    }
+
+//-----------------------------------------------------------------------------
+ 
 #define PRECISION   1.0e-4
 // 0--equal
 // 1- cmp > base
