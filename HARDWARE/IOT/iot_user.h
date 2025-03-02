@@ -1,13 +1,14 @@
 #ifndef __ITO_USER_H
 #define __ITO_USER_H
-#include "sys.h"  //°üº¬ĞèÒªµÄÍ·ÎÄ¼ş
+#include "iot_common.h"
 
-void Timed_Data_UpLoad(void);//¶¨Ê±ÉÏ´«ÈÎÎñ
+
+void Timed_Data_UpLoad(void);//å®šæ—¶ä¸Šä¼ ä»»åŠ¡
 u32 Extract_digit(u8 *str);
-void Switch_Sta(void *str);//·¢²¼¿ª¹ØµÄ×´Ì¬¸ø·şÎñÆ÷ 
+void Switch_Sta(void *str);//å‘å¸ƒå¼€å…³çš„çŠ¶æ€ç»™æœåŠ¡å™¨ 
 
 
-/******Ö÷º¯ÊıÖĞµ÷ÓÃ***********/
+/******ä¸»å‡½æ•°ä¸­è°ƒç”¨***********/
 extern void IOT_Connect(void);
 extern void IOT_init(void);
 

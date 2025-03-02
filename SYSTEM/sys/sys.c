@@ -1,56 +1,47 @@
 #include "sys.h"
-
-//THUMBæŒ‡ä»¤ä¸æ”¯æŒæ±‡ç¼–å†…è”
-//é‡‡ç”¨å¦‚ä¸‹æ–¹æ³•å®ç°æ‰§è¡Œæ±‡ç¼–æŒ‡ä»¤WFI  
+void Init_GPIO_Clock(GPIO_TypeDef* GPIOx)
+{
+    if(GPIOx == GPIOA)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
+    }
+    else if(GPIOx == GPIOB)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
+    }
+    else if (GPIOx == GPIOC)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);
+    }
+    else if (GPIOx == GPIOD)
+    {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD,ENABLE);
+    }
+}
+//THUMBÖ¸Áî²»Ö§³Ö»ã±àÄÚÁª
+//²ÉÓÃÈçÏÂ·½·¨ÊµÏÖÖ´ĞĞ»ã±àÖ¸ÁîWFI  
 void WFI_SET(void)
 {
 	__ASM volatile("wfi");		  
 }
-//å…³é—­æ‰€æœ‰ä¸­æ–­
+//¹Ø±ÕËùÓĞÖĞ¶Ï
 void INTX_DISABLE(void)
 {		  
 	__ASM volatile("cpsid i");
 }
-//å¼€å¯æ‰€æœ‰ä¸­æ–­
+//¿ªÆôËùÓĞÖĞ¶Ï
 void INTX_ENABLE(void)
 {
 	__ASM volatile("cpsie i");		  
 }
-//è®¾ç½®æ ˆé¡¶åœ°å€
-//addr:æ ˆé¡¶åœ°å€
+//ÉèÖÃÕ»¶¥µØÖ·
+//addr:Õ»¶¥µØÖ·
 __asm void MSR_MSP(u32 addr) 
 {
     MSR MSP, r0 			//set Main Stack value
     BX r14
 }
-//---------------------------------------------------------------
-//ç”¨æˆ·è‡ªå®šä¹‰çš„å‡½æ•°
-void Set_Pin_Output_Mode(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
-{
- 	GPIO_InitTypeDef  GPIO_InitStructure;
-	INIT_GPIO_CLOCK(GPIOx);
- 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin;
- 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		  
- 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
- 	GPIO_Init(GPIOx, &GPIO_InitStructure);
-}
-void Set_Pin_Input_Mode(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
-{
-		GPIO_InitTypeDef  GPIO_InitStructure;
-		INIT_GPIO_CLOCK(GPIOx);
-		GPIO_InitStructure.GPIO_Pin = GPIO_Pin;
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; 		  
-		GPIO_Init(GPIOx, &GPIO_InitStructure);
-}
 
-u8 Find_str(char *a,char *sub)  //bä¸ºå­ä¸²
-{ 
-  if(strstr(a,sub)!=NULL)
-	    return 1;
-	else
-	    return 0;
-}
-#define PRECISION   1.0e-4
 int floatCompare(float base, float cmp)
 {
     float diff = cmp - base;
@@ -65,4 +56,21 @@ int floatCompare(float base, float cmp)
     {
         return -1;
     }
+}
+void Set_Pin_Output_Mode(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
+{
+ 	GPIO_InitTypeDef  GPIO_InitStructure;
+	INIT_GPIO_CLOCK(GPIOx);
+ 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin;
+ 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		  
+ 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 	GPIO_Init(GPIOx, &GPIO_InitStructure);
+}
+void Set_Pin_Input_Mode(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
+{
+  GPIO_InitTypeDef  GPIO_InitStructure;
+	INIT_GPIO_CLOCK(GPIOx);
+ 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin;
+ 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; 		  
+ 	GPIO_Init(GPIOx, &GPIO_InitStructure);
 }

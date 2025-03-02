@@ -1,6 +1,6 @@
 #include "utils_hmac.h"
-#include "utils_md5.h"
-#include "utils_sha1.h"
+#include "iot_common.h"
+
 #include "sys.h"
 #define KEY_IOPAD_SIZE 64
 #define MD5_DIGEST_SIZE 16

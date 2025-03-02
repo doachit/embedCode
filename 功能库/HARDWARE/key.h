@@ -14,9 +14,6 @@
 #define KEY2  GPIO_ReadInputDataBit(KEY_PORT,KEY_PIN3)//读取按键2
 #define KEY3  GPIO_ReadInputDataBit(KEY_PORT,KEY_PIN4)//读取按键3
 
-#define SET_TIME_PORT   GPIOA
-#define SET_TIME_PIN    GPIO_Pin_8
-#define SET_TIME_ENABLE (GPIO_ReadInputDataBit(SET_TIME_PORT,SET_TIME_PIN)==1)
 #define KEY0_PRES	1		//KEY0  
 #define KEY1_PRES	2		//KEY1 
 #define KEY2_PRES	3		//KEY2  

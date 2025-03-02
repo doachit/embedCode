@@ -1,7 +1,6 @@
 #include "utils_hmac.h"
-#include "utils_md5.h"
-#include "utils_sha1.h"
-#include "sys.h"
+#include "iot_common.h"
+
 /* Implementation that should never be optimized out by the compiler */
 static void utils_sha1_zeroize(void *v, size_t n)
 {

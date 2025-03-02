@@ -3,8 +3,8 @@
 #include "sys.h"
 
 #define ACK	 0
-#define	NACK 1  //²»Ó¦´ğ»ò·ñ¶¨µÄÓ¦´ğ
-#define SA				0x00 //´Ó»úµØÖ·£¬µ¥¸öMLX90614Ê±µØÖ·Îª0x00,¶à¸öÊ±µØÖ·Ä¬ÈÏÎª0x5a
+#define	NACK 1  //ä¸åº”ç­”æˆ–å¦å®šçš„åº”ç­”
+#define SA				0x00 //ä»æœºåœ°å€ï¼Œå•ä¸ªMLX90614æ—¶åœ°å€ä¸º0x00,å¤šä¸ªæ—¶åœ°å€é»˜è®¤ä¸º0x5a
 #define RAM_ACCESS		0x00 //RAM access command
 #define EEPROM_ACCESS	0x20 //EEPROM access command
 #define RAM_TOBJ1		0x07 //To1 address in the eeprom
@@ -19,7 +19,7 @@
 #define SMBUS_SDA_H()	    SMBUS_PORT->BSRR = SMBUS_SDA
 #define SMBUS_SDA_L()	    SMBUS_PORT->BRR = SMBUS_SDA
 
-#define SMBUS_SDA_PIN()	    GPIO_ReadInputDataBit(SMBUS_PORT,SMBUS_SDA)//¶ÁÈ¡Òı½ÅµçÆ½
+#define SMBUS_SDA_PIN()	    GPIO_ReadInputDataBit(SMBUS_PORT,SMBUS_SDA)//è¯»å–å¼•è„šç”µå¹³
 
 
 void SMBus_StartBit(void);
@@ -32,5 +32,5 @@ void SMBus_Delay(u16);
 void SMBus_Init(void);
 u16 SMBus_ReadMemory(u8, u8);
 u8 PEC_Calculation(u8*);
-float SMBus_ReadTemp(void);    //»ñÈ¡ÎÂ¶ÈÖµ
+float SMBus_ReadTemp(void);    //è·å–æ¸©åº¦å€¼
 #endif

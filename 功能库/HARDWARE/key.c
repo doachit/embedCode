@@ -26,9 +26,6 @@ void KEY_Init(void)
 
 	GPIO_InitStructure.GPIO_Pin  = KEY_PIN4;
  	GPIO_Init(KEY_PORT, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin  = SET_TIME_PIN;
- 	GPIO_Init(SET_TIME_PORT, &GPIO_InitStructure);
 } 
 //按键处理函数
 //返回按键值

@@ -20,6 +20,27 @@ int gHumiThresold = 90;
 u8 motorWorkFlag;
 DHT11_Data_TypeDef dht11Data;
 void SYS_Init(void);
+
+// 应用示例
+int main(void) {
+    SYS_Init(); // 系统时钟初始化
+    
+    HX710B_GPIO_Init();
+
+    while(1) {
+        int32_t raw_data = HX710B_ReadCount(10000); // 100ms超时
+        if(raw_data != 0x800000) {
+            // 有效数据处理...
+            printf("data is %x\n",raw_data);
+            
+        } else {
+            // 错误处理...
+            printf("error\n");
+        }
+        delay_ms(10); // 适当延时
+    }
+}
+#if 0
 int main(void) 
 {
     char oledBuf[10];
@@ -147,6 +168,7 @@ int main(void)
         //OLED_ShowString(0,0,"               ",16,1);      
     #endif  
 }
+#endif
 /**
   * @brief  系统初始化总函数
   * @param  无
@@ -160,7 +182,7 @@ void SYS_Init(void)
 	USART_Config();	 	                         //串口初始化为9600
     //OLED_Init();
 	//beep_Init();	
-    DHT11_Init(); //温湿度计控制
+    //DHT11_Init(); //温湿度计控制
     //WATER_Init();   //水滴传感器
     //INS_Init();     //红外传感器
     //SWITCH_Init();  //喷药和关窗控制

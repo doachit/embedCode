@@ -412,6 +412,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\dht11.c</FilePath>
             </File>
+            <File>
+              <FileName>TM7711.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\TM7711.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

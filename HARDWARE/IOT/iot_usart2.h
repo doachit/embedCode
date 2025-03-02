@@ -5,6 +5,8 @@
 #include "stdio.h"      //包含需要的头文件
 #include "stdarg.h"		//包含需要的头文件 
 #include "string.h"     //包含需要的头文件
+#include "iot_common.h"
+
 #define USART2_TXBUFF_SIZE   1024   //定义串口2 发送缓冲区大小 1024字节
 
 #if  USART2_RX_ENABLE                          //如果使能接收功能

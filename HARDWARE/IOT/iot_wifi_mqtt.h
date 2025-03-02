@@ -1,160 +1,161 @@
 #ifndef __ITO_WIFI_MQTT_H
 #define __ITO_WIFI_MQTT_H
 
-#include "sys.h"       //°üº¬ÐèÒªµÄÍ·ÎÄ¼þ
+#include "iot_common.h"
 
-/*--------------ÊÇ·ñ¿ªÆô´®¿Úµ÷ÊÔÄ£Ê½---------------------------------*/
-#define mqtt_debug    0   //1 ¿ªÆôµ÷ÊÔ  0¹Ø±Õµ÷ÊÔ
-#define IotDebug_prinf(...) printf(__VA_ARGS__) //µ÷ÊÔµÄ´®¿Úº¯Êý¿É¸ü»»Îª×Ô¼ºµÄ
 
-/*------------------------------------------------------------ mqttµÄÍ·ÎÄ¼þ----------------------------------------------------*/
-/*------------------------------------------------------------ mqttµÄÍ·ÎÄ¼þ----------------------------------------------------*/
-/*------------------------------------------------------------ mqttµÄÍ·ÎÄ¼þ----------------------------------------------------*/
-#define  R_NUM               7     //½ÓÊÕ»º³åÇø¸öÊý
-#define  RBUFF_UNIT          400   //½ÓÊÕ»º³åÇø³¤¶È
+/*--------------æ˜¯å¦å¼€å¯ä¸²å£è°ƒè¯•æ¨¡å¼---------------------------------*/
+#define mqtt_debug    0   //1 å¼€å¯è°ƒè¯•  0å…³é—­è°ƒè¯•
+#define IotDebug_prinf(...) printf(__VA_ARGS__) //è°ƒè¯•çš„ä¸²å£å‡½æ•°å¯æ›´æ¢ä¸ºè‡ªå·±çš„
 
-#define  T_NUM               7     //·¢ËÍ»º³åÇø¸öÊý  
-#define  TBUFF_UNIT          400   //·¢ËÍ»º³åÇø³¤¶È
+/*------------------------------------------------------------ mqttçš„å¤´æ–‡ä»¶----------------------------------------------------*/
+/*------------------------------------------------------------ mqttçš„å¤´æ–‡ä»¶----------------------------------------------------*/
+/*------------------------------------------------------------ mqttçš„å¤´æ–‡ä»¶----------------------------------------------------*/
+#define  R_NUM               7     //æŽ¥æ”¶ç¼“å†²åŒºä¸ªæ•°
+#define  RBUFF_UNIT          400   //æŽ¥æ”¶ç¼“å†²åŒºé•¿åº¦
 
-#define  C_NUM               7     //ÃüÁî»º³åÇø¸öÊý
-#define  CBUFF_UNIT          400   //ÃüÁî»º³åÇø³¤¶È
+#define  T_NUM               7     //å‘é€ç¼“å†²åŒºä¸ªæ•°  
+#define  TBUFF_UNIT          400   //å‘é€ç¼“å†²åŒºé•¿åº¦
+
+#define  C_NUM               7     //å‘½ä»¤ç¼“å†²åŒºä¸ªæ•°
+#define  CBUFF_UNIT          400   //å‘½ä»¤ç¼“å†²åŒºé•¿åº¦
            
-#define  MQTT_TxData(x)       u2_TxData(x)                                         //´®¿Ú2¸ºÔðÊý¾Ý·¢ËÍ
-#define  WIFIID             "302a"    //³õÊ¼»¯µÄÂ·ÓÉÆ÷SSIDÃû³Æ
-#define  PASSWORD           "1234abcd+-*/"       //³õÊ¼»¯µÄÂ·ÓÉÆ÷ÃÜÂë
+#define  MQTT_TxData(x)       u2_TxData(x)                                         //ä¸²å£2è´Ÿè´£æ•°æ®å‘é€
+#define  WIFIID             "302a"    //åˆå§‹åŒ–çš„è·¯ç”±å™¨SSIDåç§°
+#define  PASSWORD           "1234abcd+-*/"       //åˆå§‹åŒ–çš„è·¯ç”±å™¨å¯†ç 
 
 
 
-#define PRODUCTKEY           "a1Bgo8sVlSl"  																			//²úÆ·ID
-#define PRODUCTKEY_LEN       strlen(PRODUCTKEY)                                   //²úÆ·ID³¤¶È
-#define DEVICENAME           "mytest" 																						//Éè±¸Ãû 
-#define DEVICENAME_LEN       strlen(DEVICENAME)                                   //Éè±¸Ãû³¤¶È
-#define DEVICESECRE          "35c77a1c88b49ddfe07e46ee856a6e0a"  									//Éè±¸ÃØÔ¿
-#define DEVICESECRE_LEN      strlen(DEVICESECRE) 																	//Éè±¸ÃØÔ¿³¤¶È
+#define PRODUCTKEY           "a1Bgo8sVlSl"  																			//äº§å“ID
+#define PRODUCTKEY_LEN       strlen(PRODUCTKEY)                                   //äº§å“IDé•¿åº¦
+#define DEVICENAME           "mytest" 																						//è®¾å¤‡å 
+#define DEVICENAME_LEN       strlen(DEVICENAME)                                   //è®¾å¤‡åé•¿åº¦
+#define DEVICESECRE          "35c77a1c88b49ddfe07e46ee856a6e0a"  									//è®¾å¤‡ç§˜é’¥
+#define DEVICESECRE_LEN      strlen(DEVICESECRE) 																	//è®¾å¤‡ç§˜é’¥é•¿åº¦
 
-// Ê¹ÓÃ¼òµ¥µÄºêÁ¬½Ó£¬µ«×¢ÒâÕâÀïÎÒÃÇ²»ÄÜÖ±½ÓÔÚºê¶¨ÒåÖÐÁ¬½Ó×Ö·û´®×ÖÃæÁ¿ºÍºê  
+// ä½¿ç”¨ç®€å•çš„å®è¿žæŽ¥ï¼Œä½†æ³¨æ„è¿™é‡Œæˆ‘ä»¬ä¸èƒ½ç›´æŽ¥åœ¨å®å®šä¹‰ä¸­è¿žæŽ¥å­—ç¬¦ä¸²å­—é¢é‡å’Œå®  
 #define S_TOPIC_PREFIX       "/sys/"  
 #define S_TOPIC_MIDDLE       PRODUCTKEY "/" DEVICENAME  
 #define S_TOPIC_SUFFIX       "/thing/service/property/set"  
-#define S_TOPIC_NAME         S_TOPIC_PREFIX S_TOPIC_MIDDLE S_TOPIC_SUFFIX  		//ÐèÒª¶©ÔÄµÄÖ÷Ìâ 
+#define S_TOPIC_NAME         S_TOPIC_PREFIX S_TOPIC_MIDDLE S_TOPIC_SUFFIX  		//éœ€è¦è®¢é˜…çš„ä¸»é¢˜ 
   
-// ÎªP_TOPIC_NAME¶¨Òå  
+// ä¸ºP_TOPIC_NAMEå®šä¹‰  
 #define P_TOPIC_PREFIX       "/sys/"  
 #define P_TOPIC_MIDDLE       PRODUCTKEY "/" DEVICENAME  
 #define P_TOPIC_SUFFIX       "/thing/event/property/post"  
-#define P_TOPIC_NAME         P_TOPIC_PREFIX P_TOPIC_MIDDLE P_TOPIC_SUFFIX							//ÐèÒª·¢²¼µÄÖ÷Ìâ  
+#define P_TOPIC_NAME         P_TOPIC_PREFIX P_TOPIC_MIDDLE P_TOPIC_SUFFIX							//éœ€è¦å‘å¸ƒçš„ä¸»é¢˜  
 
-extern unsigned char  MQTT_RxDataBuf[R_NUM][RBUFF_UNIT];       //Íâ²¿±äÁ¿ÉùÃ÷£¬Êý¾ÝµÄ½ÓÊÕ»º³åÇø,ËùÓÐ·þÎñÆ÷·¢À´µÄÊý¾Ý£¬´æ·ÅÔÚ¸Ã»º³åÇø,»º³åÇøµÚÒ»¸ö×Ö½Ú´æ·ÅÊý¾Ý³¤¶È
-extern unsigned char *MQTT_RxDataInPtr;                        //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø´æ·ÅÊý¾ÝµÄÎ»ÖÃ
-extern unsigned char *MQTT_RxDataOutPtr;                       //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø¶ÁÈ¡Êý¾ÝµÄÎ»ÖÃ
-extern unsigned char *MQTT_RxDataEndPtr;                       //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø½áÊøµÄÎ»ÖÃ
-extern unsigned char  MQTT_TxDataBuf[T_NUM][TBUFF_UNIT];       //Íâ²¿±äÁ¿ÉùÃ÷£¬Êý¾ÝµÄ·¢ËÍ»º³åÇø,ËùÓÐ·¢Íù·þÎñÆ÷µÄÊý¾Ý£¬´æ·ÅÔÚ¸Ã»º³åÇø,»º³åÇøµÚÒ»¸ö×Ö½Ú´æ·ÅÊý¾Ý³¤¶È
-extern unsigned char *MQTT_TxDataInPtr;                        //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø´æ·ÅÊý¾ÝµÄÎ»ÖÃ
-extern unsigned char *MQTT_TxDataOutPtr;                       //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø¶ÁÈ¡Êý¾ÝµÄÎ»ÖÃ
-extern unsigned char *MQTT_TxDataEndPtr;                       //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø½áÊøµÄÎ»ÖÃ
-extern unsigned char  MQTT_CMDBuf[C_NUM][CBUFF_UNIT];          //Íâ²¿±äÁ¿ÉùÃ÷£¬ÃüÁîÊý¾ÝµÄ½ÓÊÕ»º³åÇø
-extern unsigned char *MQTT_CMDInPtr;                           //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø´æ·ÅÊý¾ÝµÄÎ»ÖÃ
-extern unsigned char *MQTT_CMDOutPtr;                          //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø¶ÁÈ¡Êý¾ÝµÄÎ»ÖÃ
-extern unsigned char *MQTT_CMDEndPtr;                          //Íâ²¿±äÁ¿ÉùÃ÷£¬Ö¸Ïò»º³åÇø½áÊøµÄÎ»ÖÃ
+extern unsigned char  MQTT_RxDataBuf[R_NUM][RBUFF_UNIT];       //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œæ•°æ®çš„æŽ¥æ”¶ç¼“å†²åŒº,æ‰€æœ‰æœåŠ¡å™¨å‘æ¥çš„æ•°æ®ï¼Œå­˜æ”¾åœ¨è¯¥ç¼“å†²åŒº,ç¼“å†²åŒºç¬¬ä¸€ä¸ªå­—èŠ‚å­˜æ”¾æ•°æ®é•¿åº¦
+extern unsigned char *MQTT_RxDataInPtr;                        //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„ä½ç½®
+extern unsigned char *MQTT_RxDataOutPtr;                       //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºè¯»å–æ•°æ®çš„ä½ç½®
+extern unsigned char *MQTT_RxDataEndPtr;                       //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºç»“æŸçš„ä½ç½®
+extern unsigned char  MQTT_TxDataBuf[T_NUM][TBUFF_UNIT];       //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œæ•°æ®çš„å‘é€ç¼“å†²åŒº,æ‰€æœ‰å‘å¾€æœåŠ¡å™¨çš„æ•°æ®ï¼Œå­˜æ”¾åœ¨è¯¥ç¼“å†²åŒº,ç¼“å†²åŒºç¬¬ä¸€ä¸ªå­—èŠ‚å­˜æ”¾æ•°æ®é•¿åº¦
+extern unsigned char *MQTT_TxDataInPtr;                        //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„ä½ç½®
+extern unsigned char *MQTT_TxDataOutPtr;                       //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºè¯»å–æ•°æ®çš„ä½ç½®
+extern unsigned char *MQTT_TxDataEndPtr;                       //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºç»“æŸçš„ä½ç½®
+extern unsigned char  MQTT_CMDBuf[C_NUM][CBUFF_UNIT];          //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå‘½ä»¤æ•°æ®çš„æŽ¥æ”¶ç¼“å†²åŒº
+extern unsigned char *MQTT_CMDInPtr;                           //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„ä½ç½®
+extern unsigned char *MQTT_CMDOutPtr;                          //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºè¯»å–æ•°æ®çš„ä½ç½®
+extern unsigned char *MQTT_CMDEndPtr;                          //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒæŒ‡å‘ç¼“å†²åŒºç»“æŸçš„ä½ç½®
 
-extern char ClientID[128];     //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·Å¿Í»§¶ËIDµÄ»º³åÇø
-extern int  ClientID_len;      //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·Å¿Í»§¶ËIDµÄ³¤¶È
-extern char Username[128];     //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·ÅÓÃ»§ÃûµÄ»º³åÇø
-extern int  Username_len;	   //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·ÅÓÃ»§ÃûµÄ³¤¶È
-extern char Passward[128];     //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·ÅÃÜÂëµÄ»º³åÇø
-extern int  Passward_len;	   //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·ÅÃÜÂëµÄ³¤¶È
-extern char ServerIP[128];     //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·Å·þÎñÆ÷IP»òÊÇÓòÃû
-extern int  ServerPort;        //Íâ²¿±äÁ¿ÉùÃ÷£¬´æ·Å·þÎñÆ÷µÄ¶Ë¿ÚºÅ
+extern char ClientID[128];     //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾å®¢æˆ·ç«¯IDçš„ç¼“å†²åŒº
+extern int  ClientID_len;      //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾å®¢æˆ·ç«¯IDçš„é•¿åº¦
+extern char Username[128];     //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾ç”¨æˆ·åçš„ç¼“å†²åŒº
+extern int  Username_len;	   //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾ç”¨æˆ·åçš„é•¿åº¦
+extern char Passward[128];     //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾å¯†ç çš„ç¼“å†²åŒº
+extern int  Passward_len;	   //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾å¯†ç çš„é•¿åº¦
+extern char ServerIP[128];     //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾æœåŠ¡å™¨IPæˆ–æ˜¯åŸŸå
+extern int  ServerPort;        //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œå­˜æ”¾æœåŠ¡å™¨çš„ç«¯å£å·
 
-extern char Ping_flag;         //Íâ²¿±äÁ¿ÉùÃ÷£¬ping±¨ÎÄ×´Ì¬      0£ºÕý³£×´Ì¬£¬µÈ´ý¼ÆÊ±Ê±¼äµ½£¬·¢ËÍPing±¨ÎÄ
-                               //Íâ²¿±äÁ¿ÉùÃ÷£¬ping±¨ÎÄ×´Ì¬      1£ºPing±¨ÎÄÒÑ·¢ËÍ£¬µ±ÊÕµ½ ·þÎñÆ÷»Ø¸´±¨ÎÄµÄºó ½«1ÖÃÎª0
-extern char ConnectALi_flag;      //Íâ²¿±äÁ¿ÉùÃ÷£¬Í¬·þÎñÆ÷Á¬½Ó×´Ì¬  0£º»¹Ã»ÓÐÁ¬½Ó·þÎñÆ÷  1£ºÁ¬½ÓÉÏ·þÎñÆ÷ÁË
-extern char ReConnectALi_flag;    //Íâ²¿±äÁ¿ÉùÃ÷£¬ÖØÁ¬·þÎñÆ÷×´Ì¬    0£ºÁ¬½Ó»¹´æÔÚ  1£ºÁ¬½Ó¶Ï¿ª£¬ÖØÁ¬
-extern char ConnectPack_flag;  //Íâ²¿±äÁ¿ÉùÃ÷£¬CONNECT±¨ÎÄ×´Ì¬   1£ºCONNECT±¨ÎÄ³É¹¦
-extern char SubcribePack_flag; //Íâ²¿±äÁ¿ÉùÃ÷£¬¶©ÔÄ±¨ÎÄ×´Ì¬      1£º¶©ÔÄ±¨ÎÄ³É¹¦
+extern char Ping_flag;         //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒpingæŠ¥æ–‡çŠ¶æ€      0ï¼šæ­£å¸¸çŠ¶æ€ï¼Œç­‰å¾…è®¡æ—¶æ—¶é—´åˆ°ï¼Œå‘é€PingæŠ¥æ–‡
+                               //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒpingæŠ¥æ–‡çŠ¶æ€      1ï¼šPingæŠ¥æ–‡å·²å‘é€ï¼Œå½“æ”¶åˆ° æœåŠ¡å™¨å›žå¤æŠ¥æ–‡çš„åŽ å°†1ç½®ä¸º0
+extern char ConnectALi_flag;      //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒåŒæœåŠ¡å™¨è¿žæŽ¥çŠ¶æ€  0ï¼šè¿˜æ²¡æœ‰è¿žæŽ¥æœåŠ¡å™¨  1ï¼šè¿žæŽ¥ä¸ŠæœåŠ¡å™¨äº†
+extern char ReConnectALi_flag;    //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œé‡è¿žæœåŠ¡å™¨çŠ¶æ€    0ï¼šè¿žæŽ¥è¿˜å­˜åœ¨  1ï¼šè¿žæŽ¥æ–­å¼€ï¼Œé‡è¿ž
+extern char ConnectPack_flag;  //å¤–éƒ¨å˜é‡å£°æ˜Žï¼ŒCONNECTæŠ¥æ–‡çŠ¶æ€   1ï¼šCONNECTæŠ¥æ–‡æˆåŠŸ
+extern char SubcribePack_flag; //å¤–éƒ¨å˜é‡å£°æ˜Žï¼Œè®¢é˜…æŠ¥æ–‡çŠ¶æ€      1ï¼šè®¢é˜…æŠ¥æ–‡æˆåŠŸ
 
 
 
-/***********Á¬½Ó·þÎñÆ÷º¯Êý£¨Ö÷º¯ÊýÖÐ³õÊ¼»¯£©****************************/
+/***********è¿žæŽ¥æœåŠ¡å™¨å‡½æ•°ï¼ˆä¸»å‡½æ•°ä¸­åˆå§‹åŒ–ï¼‰****************************/
 void Connect_server(void);
 
 
 
-/***********°¢ÀïÔÆÁªÍøÐÅÏ¢¼ÓÔØ£¨Ö÷º¯ÊýÖÐ³õÊ¼»¯£©****************************/
+/***********é˜¿é‡Œäº‘è”ç½‘ä¿¡æ¯åŠ è½½ï¼ˆä¸»å‡½æ•°ä¸­åˆå§‹åŒ–ï¼‰****************************/
 void AliIoT_Parameter_Init(void);
 
-/***********ÈÝÆ÷³õÊ¼»¯ ºÍ ¼ÓÔØÁ¬½Ó±¨ÎÄºÍ¶©ÔÄ±¨ÎÄµ½ÈÝÆ÷ÖÐ£¨³É¹¦Á¬½Ó°¢ÀïÔÆºóÖ´ÐÐ£©****************************/
+/***********å®¹å™¨åˆå§‹åŒ– å’Œ åŠ è½½è¿žæŽ¥æŠ¥æ–‡å’Œè®¢é˜…æŠ¥æ–‡åˆ°å®¹å™¨ä¸­ï¼ˆæˆåŠŸè¿žæŽ¥é˜¿é‡Œäº‘åŽæ‰§è¡Œï¼‰****************************/
 void MQTT_Buff_Init(void);
 
 /*
-				1.·¢ËÍµÄÊý¾Ý´æÈë·¢ËÍÈÝÆ÷º¯Êý
+				1.å‘é€çš„æ•°æ®å­˜å…¥å‘é€å®¹å™¨å‡½æ•°
 */
-///½«µ¥Æ¬»úÒª·¢ËÍµÄÊý¾Ý·Åµ½·¢ËÍÈÝÆ÷
-/***********µ¥Æ¬»ú·¢ËÍÊ®Áù½øÖÆÁ¬½Ó±¨ÎÄµ½ÈÝÆ÷£¨ÄÚ²¿º¯Êý£©****************************/
+///å°†å•ç‰‡æœºè¦å‘é€çš„æ•°æ®æ”¾åˆ°å‘é€å®¹å™¨
+/***********å•ç‰‡æœºå‘é€åå…­è¿›åˆ¶è¿žæŽ¥æŠ¥æ–‡åˆ°å®¹å™¨ï¼ˆå†…éƒ¨å‡½æ•°ï¼‰****************************/
 void Mqtt_ConnectMessege_To_Buff(void);
 
-/***********µ¥Æ¬»ú·¢ËÍÊ®Áù½øÖÆ¶©ÔÄ±¨ÎÄµ½ÈÝÆ÷£¨ÄÚ²¿º¯Êý£©****************************/
+/***********å•ç‰‡æœºå‘é€åå…­è¿›åˆ¶è®¢é˜…æŠ¥æ–‡åˆ°å®¹å™¨ï¼ˆå†…éƒ¨å‡½æ•°ï¼‰****************************/
 void Mqtt_SubscribeMessage_To_Buff(char *topic_name, int QoS);
 
-/***********µ¥Æ¬»ú·¢ËÍÊ®Áù½øÖÆPubilsh±¨ÎÄµ½ÈÝÆ÷£¨ÄÚ²¿º¯Êý£©****************************/
+/***********å•ç‰‡æœºå‘é€åå…­è¿›åˆ¶PubilshæŠ¥æ–‡åˆ°å®¹å™¨ï¼ˆå†…éƒ¨å‡½æ•°ï¼‰****************************/
 void Mqtt_PublishQs0Message_To_Buff(char *topic, char *data, int data_len);
 
-/***********µ¥Æ¬»ú·¢ËÍÊ®Áù½øÖÆPING±¨ÎÄµ½ÈÝÆ÷£¨ÄÚ²¿º¯Êý£©****************************/
+/***********å•ç‰‡æœºå‘é€åå…­è¿›åˆ¶PINGæŠ¥æ–‡åˆ°å®¹å™¨ï¼ˆå†…éƒ¨å‡½æ•°ï¼‰****************************/
 void Mqtt_PingMessage_To_Buff(void);
 
 
 /*
-				2.·¢ËÍÈÝÆ÷ÖÐµÄÊý¾Ý ·¢ËÍµ½ÔÆÆ½Ì¨º¯Êý
+				2.å‘é€å®¹å™¨ä¸­çš„æ•°æ® å‘é€åˆ°äº‘å¹³å°å‡½æ•°
 */
 
-/***********½«ÈÝÆ÷ÖÐÊý¾Ý Í¨¹ý´®¿Ú2·¢ËÍ³öÈ¥****************************/
+/***********å°†å®¹å™¨ä¸­æ•°æ® é€šè¿‡ä¸²å£2å‘é€å‡ºåŽ»****************************/
 extern void TxBuff_DataSend(void); 
 
 
   
 /*
-					3.ÔÆÆ½Ì¨·¢ËÍµÄÃüÁî·ÅÈëÃüÁî»º´æº¯Êý
+					3.äº‘å¹³å°å‘é€çš„å‘½ä»¤æ”¾å…¥å‘½ä»¤ç¼“å­˜å‡½æ•°
 */
 
-/***********½«½ÓÊÕÈÝÆ÷ÖÐµÄÊý¾Ý ¾­´¦Àíºó ·ÅÈëCmdÈÝÆ÷ÖÐ£¨ÄÚ²¿º¯Êý£©****************************/
-void Mqtt_RxBuffData_To_CmdBuffData(unsigned char *redata);//½«ÔÆ¶Ë½ÓÊÕµÄÃüÁî·ÅÈë½ÓÊÕÈÝÆ÷
+/***********å°†æŽ¥æ”¶å®¹å™¨ä¸­çš„æ•°æ® ç»å¤„ç†åŽ æ”¾å…¥Cmdå®¹å™¨ä¸­ï¼ˆå†…éƒ¨å‡½æ•°ï¼‰****************************/
+void Mqtt_RxBuffData_To_CmdBuffData(unsigned char *redata);//å°†äº‘ç«¯æŽ¥æ”¶çš„å‘½ä»¤æ”¾å…¥æŽ¥æ”¶å®¹å™¨
 
 
 
 /*
-				4.¶ÁÈ¡ÃüÁî»º´æÖÐµÄÃüÁî ²¢½øÐÐ¹¦ÄÜÖ´ÐÐº¯Êý
+				4.è¯»å–å‘½ä»¤ç¼“å­˜ä¸­çš„å‘½ä»¤ å¹¶è¿›è¡ŒåŠŸèƒ½æ‰§è¡Œå‡½æ•°
 */
-/******ÔÚÉÏÃæº¯ÊýÊÕµ½Êý¾Ý ÇÒÕâ¸öÊý¾ÝÊÇÃüÁîÊý¾Ýºó »á½øÐÐ´¦Àí Ñ¹ÈëÃüÁî»º³åÇø ²¢ÔÚ´Ë´¦Àí£¨ÐèÒªÑ­»·µ÷ÓÃ£©***********/
-extern void ITO_GetCmdData_Deal(void);//µÃµ½ÔÆ¶Ë·¢ËÍµÄ ÃüÁî ½øÐÐ´¦ÀíµÄº¯Êý
+/******åœ¨ä¸Šé¢å‡½æ•°æ”¶åˆ°æ•°æ® ä¸”è¿™ä¸ªæ•°æ®æ˜¯å‘½ä»¤æ•°æ®åŽ ä¼šè¿›è¡Œå¤„ç† åŽ‹å…¥å‘½ä»¤ç¼“å†²åŒº å¹¶åœ¨æ­¤å¤„ç†ï¼ˆéœ€è¦å¾ªçŽ¯è°ƒç”¨ï¼‰***********/
+extern void ITO_GetCmdData_Deal(void);//å¾—åˆ°äº‘ç«¯å‘é€çš„ å‘½ä»¤ è¿›è¡Œå¤„ç†çš„å‡½æ•°
 
 
 
   
 
 
-//ÄÚÄÚ²¿º¯Êý£º¾ßÌåÖ´ÐÐ¹¦ÄÜ
+//å†…å†…éƒ¨å‡½æ•°ï¼šå…·ä½“æ‰§è¡ŒåŠŸèƒ½
 
-/***********¾ßÌåÖ´ÐÐ½«Òª·¢ËÍµÄÊ®Áù½øÖÆÊý¾Ý ËÍÈë·¢ËÍÊý¾ÝÈÝÆ÷º¯Êý£¨ÄÚÄÚ²¿º¯Êý£©****************************/
-void Mqtt_TxData_LoadBuff_Executive (unsigned char *data, int size);//µ¥Æ¬»ú·¢ËÍÊ®Áù»úÖÆ
+/***********å…·ä½“æ‰§è¡Œå°†è¦å‘é€çš„åå…­è¿›åˆ¶æ•°æ® é€å…¥å‘é€æ•°æ®å®¹å™¨å‡½æ•°ï¼ˆå†…å†…éƒ¨å‡½æ•°ï¼‰****************************/
+void Mqtt_TxData_LoadBuff_Executive (unsigned char *data, int size);//å•ç‰‡æœºå‘é€åå…­æœºåˆ¶
 
-/***********¾ßÌåÖ´ÐÐ½«Òª½«´ÓÔÆ¶Ë½ÓÊÕµÄÊý¾Ý¼ÓÔØµ½½ÓÊÕÈÝÆ÷ÖÐ º¯Êý£¨´®¿Ú2ÖÐ²¿º¯Êý£©****************************/
+/***********å…·ä½“æ‰§è¡Œå°†è¦å°†ä»Žäº‘ç«¯æŽ¥æ”¶çš„æ•°æ®åŠ è½½åˆ°æŽ¥æ”¶å®¹å™¨ä¸­ å‡½æ•°ï¼ˆä¸²å£2ä¸­éƒ¨å‡½æ•°ï¼‰****************************/
 extern void Mqtt_RxData_LoadBuff_Executive(char *data, int size);
 
-/***********¾ßÌåÖ´ÐÐ½«½ÓÊÕµ½µÄ²¢´¦ÀíºóµÄÃüÁî ·ÅÈë»º´æÇøº¯Êýº¯Êý£¨ÄÚÄÚ²¿º¯Êý£©****************************/
+/***********å…·ä½“æ‰§è¡Œå°†æŽ¥æ”¶åˆ°çš„å¹¶å¤„ç†åŽçš„å‘½ä»¤ æ”¾å…¥ç¼“å­˜åŒºå‡½æ•°å‡½æ•°ï¼ˆå†…å†…éƒ¨å‡½æ•°ï¼‰****************************/
 void Mqtt_CmdData_LoadBuff_Executive(unsigned char *data, int size);
 
 
-/*------------------------------------------------------------ mqttµÄÍ·ÎÄ¼þ----------------------------------------------------*/
-/*------------------------------------------------------------ mqttµÄÍ·ÎÄ¼þ----------------------------------------------------*/
-/*------------------------------------------------------------ mqttµÄÍ·ÎÄ¼þ----------------------------------------------------*/
+/*------------------------------------------------------------ mqttçš„å¤´æ–‡ä»¶----------------------------------------------------*/
+/*------------------------------------------------------------ mqttçš„å¤´æ–‡ä»¶----------------------------------------------------*/
+/*------------------------------------------------------------ mqttçš„å¤´æ–‡ä»¶----------------------------------------------------*/
 
-#define WiFi_printf       u2_printf           //´®¿Ú2¿ØÖÆ WiFi
-#define WiFi_RxCounter    Usart2_RxCounter//»º´æ¶ÓÁÐ¼ÆÊý    
-#define WiFi_RX_BUF       Usart2_RxBuff    //»º´æ¶ÓÁÐÊý×é   
-#define WiFi_RXBUFF_SIZE  USART2_RXBUFF_SIZE  //´®¿Ú2¿ØÖÆ WiFi
+#define WiFi_printf       u2_printf           //ä¸²å£2æŽ§åˆ¶ WiFi
+#define WiFi_RxCounter    Usart2_RxCounter//ç¼“å­˜é˜Ÿåˆ—è®¡æ•°    
+#define WiFi_RX_BUF       Usart2_RxBuff    //ç¼“å­˜é˜Ÿåˆ—æ•°ç»„   
+#define WiFi_RXBUFF_SIZE  USART2_RXBUFF_SIZE  //ä¸²å£2æŽ§åˆ¶ WiFi
 
 
-//Ó²¼þ¸´Î»WIFIº¯Êý
+//ç¡¬ä»¶å¤ä½WIFIå‡½æ•°
 char WIFI_ConfighardwareRst(int time);
 
 char WIFI_Config(int time,char *cmd,char *response);
@@ -165,12 +166,12 @@ char WiFi_Connect_IoTServer(void);
 
 extern void WiFi_ResetIO_Init(void);
 char WiFi_Reset(int timeout);
-/*---------------------------wifiµÄÍ·ÎÄ¼þ--------------------------------------------------------*/
-/*---------------------------wifiµÄÍ·ÎÄ¼þ--------------------------------------------------------*/
-/*---------------------------wifiµÄÍ·ÎÄ¼þ--------------------------------------------------------*/
-#define RESET_IO(x)    GPIO_WriteBit(GPIOA, GPIO_Pin_4, (BitAction)x)  //PA4¿ØÖÆWiFiµÄ¸´Î»
+/*---------------------------wifiçš„å¤´æ–‡ä»¶--------------------------------------------------------*/
+/*---------------------------wifiçš„å¤´æ–‡ä»¶--------------------------------------------------------*/
+/*---------------------------wifiçš„å¤´æ–‡ä»¶--------------------------------------------------------*/
+#define RESET_IO(x)    GPIO_WriteBit(GPIOA, GPIO_Pin_4, (BitAction)x)  //PA4æŽ§åˆ¶WiFiçš„å¤ä½
 
-/*---------------------------wifiµÄÍ·ÎÄ¼þ--------------------------------------------------------*/
-/*---------------------------wifiµÄÍ·ÎÄ¼þ--------------------------------------------------------*/
-/*---------------------------wifiµÄÍ·ÎÄ¼þ--------------------------------------------------------*/
+/*---------------------------wifiçš„å¤´æ–‡ä»¶--------------------------------------------------------*/
+/*---------------------------wifiçš„å¤´æ–‡ä»¶--------------------------------------------------------*/
+/*---------------------------wifiçš„å¤´æ–‡ä»¶--------------------------------------------------------*/
 #endif

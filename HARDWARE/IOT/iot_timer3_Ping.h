@@ -1,6 +1,7 @@
 #ifndef _ITO_TIMER3_PING_H
 #define _ITO_TIMER3_PING_H
-#include "sys.h"
+#include "iot_common.h"
+
 void TIM3_ENABLE_10MS(void);
 extern int SystemTimer;							//控制上传用户数据的时间
 extern unsigned int Length_of_time; //控制发送PING报文的时间

@@ -7,96 +7,96 @@
 */
 
 #include "iot_wifi_mqtt.h"
-#include "sys.h"
-/*-----------------------------µ÷ÊÔµÄ±äÁ¿----------------------------------*/
 
-/*-------------------------------------------------------mqtt.cµÄ±äÁ¿----------------------------------*/
-//MQTT·¢ËÍÊı¾İ»º³åÇø
-unsigned char  MQTT_RxDataBuf[R_NUM][RBUFF_UNIT];           //Êı¾İµÄ½ÓÊÕ»º³åÇø,ËùÓĞ----------------·şÎñÆ÷·¢À´µÄÊı¾İ£¬´æ·ÅÔÚ¸Ã»º³åÇø,»º³åÇøµÚÒ»¸ö×Ö½Ú´æ·ÅÊı¾İ³¤¶È
-unsigned char *MQTT_RxDataInPtr;                            //Ö¸Ïò½ÓÊÕ»º³åÇø´æ·ÅÊı¾İµÄÎ»ÖÃ
-unsigned char *MQTT_RxDataOutPtr;                          //Ö¸Ïò½ÓÊÕ»º³åÇø¶ÁÈ¡Êı¾İµÄÎ»ÖÃ
-unsigned char *MQTT_RxDataEndPtr;                           //Ö¸Ïò½ÓÊÕ»º³åÇø½áÊøµÄÎ»ÖÃ
-//MQTT½ÓÊÕÊı¾İ»º³åÇø
-unsigned char  MQTT_TxDataBuf[T_NUM][TBUFF_UNIT];           //Êı¾İµÄ·¢ËÍ»º³åÇø,ËùÓĞ·¢Íù·şÎñÆ÷µÄÊı¾İ£¬´æ·ÅÔÚ¸Ã»º³åÇø,»º³åÇøµÚÒ»¸ö×Ö½Ú´æ·ÅÊı¾İ³¤¶È
-unsigned char *MQTT_TxDataInPtr;                            //Ö¸Ïò·¢ËÍ»º³åÇø´æ·ÅÊı¾İµÄÎ»ÖÃ
-unsigned char *MQTT_TxDataOutPtr;                           //Ö¸Ïò·¢ËÍ»º³åÇø¶ÁÈ¡Êı¾İµÄÎ»ÖÃ
-unsigned char *MQTT_TxDataEndPtr;                           //Ö¸Ïò·¢ËÍ»º³åÇø½áÊøµÄÎ»ÖÃ
-//MQTT½ÓÊÕÃüÁî»º³åÇø
-unsigned char  MQTT_CMDBuf[C_NUM][CBUFF_UNIT];              //ÃüÁîÊı¾İµÄ½ÓÊÕ»º³åÇø
-unsigned char *MQTT_CMDInPtr;                               //Ö¸ÏòÃüÁî»º³åÇø´æ·ÅÊı¾İµÄÎ»ÖÃ
-unsigned char *MQTT_CMDOutPtr;                              //Ö¸ÏòÃüÁî»º³åÇø¶ÁÈ¡Êı¾İµÄÎ»ÖÃ
-unsigned char *MQTT_CMDEndPtr;                              //Ö¸ÏòÃüÁî»º³åÇø½áÊøµÄÎ»ÖÃ
+/*-----------------------------è°ƒè¯•çš„å˜é‡----------------------------------*/
 
-char ClientID[128];        																	//´æ·Å¿Í»§¶ËIDµÄ»º³åÇø
-int  ClientID_len;                                          //´æ·Å¿Í»§¶ËIDµÄ³¤¶È
+/*-------------------------------------------------------mqtt.cçš„å˜é‡----------------------------------*/
+//MQTTå‘é€æ•°æ®ç¼“å†²åŒº
+unsigned char  MQTT_RxDataBuf[R_NUM][RBUFF_UNIT];           //æ•°æ®çš„æ¥æ”¶ç¼“å†²åŒº,æ‰€æœ‰----------------æœåŠ¡å™¨å‘æ¥çš„æ•°æ®ï¼Œå­˜æ”¾åœ¨è¯¥ç¼“å†²åŒº,ç¼“å†²åŒºç¬¬ä¸€ä¸ªå­—èŠ‚å­˜æ”¾æ•°æ®é•¿åº¦
+unsigned char *MQTT_RxDataInPtr;                            //æŒ‡å‘æ¥æ”¶ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„ä½ç½®
+unsigned char *MQTT_RxDataOutPtr;                          //æŒ‡å‘æ¥æ”¶ç¼“å†²åŒºè¯»å–æ•°æ®çš„ä½ç½®
+unsigned char *MQTT_RxDataEndPtr;                           //æŒ‡å‘æ¥æ”¶ç¼“å†²åŒºç»“æŸçš„ä½ç½®
+//MQTTæ¥æ”¶æ•°æ®ç¼“å†²åŒº
+unsigned char  MQTT_TxDataBuf[T_NUM][TBUFF_UNIT];           //æ•°æ®çš„å‘é€ç¼“å†²åŒº,æ‰€æœ‰å‘å¾€æœåŠ¡å™¨çš„æ•°æ®ï¼Œå­˜æ”¾åœ¨è¯¥ç¼“å†²åŒº,ç¼“å†²åŒºç¬¬ä¸€ä¸ªå­—èŠ‚å­˜æ”¾æ•°æ®é•¿åº¦
+unsigned char *MQTT_TxDataInPtr;                            //æŒ‡å‘å‘é€ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„ä½ç½®
+unsigned char *MQTT_TxDataOutPtr;                           //æŒ‡å‘å‘é€ç¼“å†²åŒºè¯»å–æ•°æ®çš„ä½ç½®
+unsigned char *MQTT_TxDataEndPtr;                           //æŒ‡å‘å‘é€ç¼“å†²åŒºç»“æŸçš„ä½ç½®
+//MQTTæ¥æ”¶å‘½ä»¤ç¼“å†²åŒº
+unsigned char  MQTT_CMDBuf[C_NUM][CBUFF_UNIT];              //å‘½ä»¤æ•°æ®çš„æ¥æ”¶ç¼“å†²åŒº
+unsigned char *MQTT_CMDInPtr;                               //æŒ‡å‘å‘½ä»¤ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„ä½ç½®
+unsigned char *MQTT_CMDOutPtr;                              //æŒ‡å‘å‘½ä»¤ç¼“å†²åŒºè¯»å–æ•°æ®çš„ä½ç½®
+unsigned char *MQTT_CMDEndPtr;                              //æŒ‡å‘å‘½ä»¤ç¼“å†²åŒºç»“æŸçš„ä½ç½®
 
-char Username[128];                                         //´æ·ÅÓÃ»§ÃûµÄ»º³åÇø
-int  Username_len;											                		//´æ·ÅÓÃ»§ÃûµÄ³¤¶È
+char ClientID[128];        																	//å­˜æ”¾å®¢æˆ·ç«¯IDçš„ç¼“å†²åŒº
+int  ClientID_len;                                          //å­˜æ”¾å®¢æˆ·ç«¯IDçš„é•¿åº¦
 
-char Passward[128];                                         //´æ·ÅÃÜÂëµÄ»º³åÇø
-int  Passward_len;								                          //´æ·ÅÃÜÂëµÄ³¤¶È
+char Username[128];                                         //å­˜æ”¾ç”¨æˆ·åçš„ç¼“å†²åŒº
+int  Username_len;											                		//å­˜æ”¾ç”¨æˆ·åçš„é•¿åº¦
 
-char ServerIP[128];	                                        //´æ·Å·şÎñÆ÷IP»òÊÇÓòÃû
-int  ServerPort;                                            //´æ·Å·şÎñÆ÷µÄ¶Ë¿ÚºÅ
+char Passward[128];                                         //å­˜æ”¾å¯†ç çš„ç¼“å†²åŒº
+int  Passward_len;								                          //å­˜æ”¾å¯†ç çš„é•¿åº¦
 
-int   Fixed_len;                       					     //¹Ì¶¨±¨Í·³¤¶È
-int   Variable_len;                     					 //¿É±ä±¨Í·³¤¶È
-int   Payload_len;                       					 //ÓĞĞ§¸ººÉ³¤¶È
-unsigned char  mqtt_buff[TBUFF_UNIT];						 //ÁÙÊ±»º³åÇø£¬¹¹½¨±¨ÎÄÓÃ
+char ServerIP[128];	                                        //å­˜æ”¾æœåŠ¡å™¨IPæˆ–æ˜¯åŸŸå
+int  ServerPort;                                            //å­˜æ”¾æœåŠ¡å™¨çš„ç«¯å£å·
 
-//ping±¨ÎÄ×´Ì¬      1£ºPing±¨ÎÄÒÑ·¢ËÍ£¬µ±ÊÕµ½ ·şÎñÆ÷»Ø¸´±¨ÎÄµÄºó ½«1ÖÃÎª0
-char Ping_flag = 0;           //ping±¨ÎÄ×´Ì¬      0£ºÕı³£×´Ì¬£¬µÈ´ı¼ÆÊ±Ê±¼äµ½£¬·¢ËÍPing±¨ÎÄ
-char ConnectALi_flag = 0;        //Í¬·şÎñÆ÷Á¬½Ó×´Ì¬  0£º»¹Ã»ÓĞÁ¬½Ó·şÎñÆ÷  1£ºÁ¬½ÓÉÏ·şÎñÆ÷ÁË
-char ConnectPack_flag = 0;    //CONNECT±¨ÎÄ×´Ì¬   1£ºCONNECT±¨ÎÄ³É¹¦
-char SubcribePack_flag = 0;   //¶©ÔÄ±¨ÎÄ×´Ì¬      1£º¶©ÔÄ±¨ÎÄ³É¹¦
+int   Fixed_len;                       					     //å›ºå®šæŠ¥å¤´é•¿åº¦
+int   Variable_len;                     					 //å¯å˜æŠ¥å¤´é•¿åº¦
+int   Payload_len;                       					 //æœ‰æ•ˆè´Ÿè·é•¿åº¦
+unsigned char  mqtt_buff[TBUFF_UNIT];						 //ä¸´æ—¶ç¼“å†²åŒºï¼Œæ„å»ºæŠ¥æ–‡ç”¨
+
+//pingæŠ¥æ–‡çŠ¶æ€      1ï¼šPingæŠ¥æ–‡å·²å‘é€ï¼Œå½“æ”¶åˆ° æœåŠ¡å™¨å›å¤æŠ¥æ–‡çš„å å°†1ç½®ä¸º0
+char Ping_flag = 0;           //pingæŠ¥æ–‡çŠ¶æ€      0ï¼šæ­£å¸¸çŠ¶æ€ï¼Œç­‰å¾…è®¡æ—¶æ—¶é—´åˆ°ï¼Œå‘é€PingæŠ¥æ–‡
+char ConnectALi_flag = 0;        //åŒæœåŠ¡å™¨è¿æ¥çŠ¶æ€  0ï¼šè¿˜æ²¡æœ‰è¿æ¥æœåŠ¡å™¨  1ï¼šè¿æ¥ä¸ŠæœåŠ¡å™¨äº†
+char ConnectPack_flag = 0;    //CONNECTæŠ¥æ–‡çŠ¶æ€   1ï¼šCONNECTæŠ¥æ–‡æˆåŠŸ
+char SubcribePack_flag = 0;   //è®¢é˜…æŠ¥æ–‡çŠ¶æ€      1ï¼šè®¢é˜…æŠ¥æ–‡æˆåŠŸ
 
 
-/*-------------------------------------------------------mqtt.cµÄ±äÁ¿----------------------------------*/
-/*----------------------------wifiµÄ±äÁ¿--------------------------------------------*/
-char wifi_mode = 0;     //ÁªÍøÄ£Ê½ 0£ºSSIDºÍÃÜÂëĞ´ÔÚ³ÌĞòÀï   1£ºSmartconfig·½Ê½ÓÃAPP·¢ËÍ
-/*----------------------------wifiµÄ±äÁ¿--------------------------------------------*/
-void  ITO_GetCmdData_Deal(void);//ÏÂ·¢ĞÅÏ¢
+/*-------------------------------------------------------mqtt.cçš„å˜é‡----------------------------------*/
+/*----------------------------wifiçš„å˜é‡--------------------------------------------*/
+char wifi_mode = 0;     //è”ç½‘æ¨¡å¼ 0ï¼šSSIDå’Œå¯†ç å†™åœ¨ç¨‹åºé‡Œ   1ï¼šSmartconfigæ–¹å¼ç”¨APPå‘é€
+/*----------------------------wifiçš„å˜é‡--------------------------------------------*/
+void  ITO_GetCmdData_Deal(void);//ä¸‹å‘ä¿¡æ¯
 
 /*-------------------------------------------------------------*/
-/*                     Á¬½Ó·şÎñÆ÷µÄº¯Êı                    */
+/*                     è¿æ¥æœåŠ¡å™¨çš„å‡½æ•°                    */
 /*-------------------------------------------------------------*/
 void Connect_server(void)
 {
     /*--------------------------------------------------------------------*/
-    /*   ConnectALi_flag=1Í¬·şÎñÆ÷½¨Á¢ÁËÁ¬½Ó,ÎÒÃÇ¿ÉÒÔ·¢²¼Êı¾İºÍ½ÓÊÕÍÆËÍÁË    */
+    /*   ConnectALi_flag=1åŒæœåŠ¡å™¨å»ºç«‹äº†è¿æ¥,æˆ‘ä»¬å¯ä»¥å‘å¸ƒæ•°æ®å’Œæ¥æ”¶æ¨é€äº†    */
     /*--------------------------------------------------------------------*/
     if(ConnectALi_flag == 1)
     {
         /*-------------------------------------------------------------*/
-        /*                     ´¦Àí·¢ËÍ»º³åÇøÊı¾İ                      */
+        /*                     å¤„ç†å‘é€ç¼“å†²åŒºæ•°æ®                      */
         /*-------------------------------------------------------------*/
-        if(MQTT_TxDataOutPtr != MQTT_TxDataInPtr)                     //if³ÉÁ¢µÄ»°£¬ËµÃ÷·¢ËÍ»º³åÇøÓĞÊı¾İÁË
+        if(MQTT_TxDataOutPtr != MQTT_TxDataInPtr)                     //ifæˆç«‹çš„è¯ï¼Œè¯´æ˜å‘é€ç¼“å†²åŒºæœ‰æ•°æ®äº†
         {
-            //3ÖÖÇé¿ö¿É½øÈëif//ÔÚÒÑÁ¬½ÓµÄÇé¿öÏÂ£¬·¢²¼ÏûÏ¢0x30£¬¶©ÔÄÇëÇó0x82£¬ĞÄÌøÇëÇó0xC0
-            //µÚ1ÖÖ£º0x10 Á¬½Ó±¨ÎÄ
-            //µÚ2ÖÖ£º0x82 ¶©ÔÄ±¨ÎÄ£¬ÇÒConnectPack_flagÖÃÎ»£¬±íÊ¾Á¬½Ó±¨ÎÄ³É¹¦
-            //µÚ3ÖÖ£ºSubcribePack_flagÖÃÎ»£¬ËµÃ÷Á¬½ÓºÍ¶©ÔÄ¾ù³É¹¦£¬ÆäËû±¨ÎÄ¿É·¢
+            //3ç§æƒ…å†µå¯è¿›å…¥if//åœ¨å·²è¿æ¥çš„æƒ…å†µä¸‹ï¼Œå‘å¸ƒæ¶ˆæ¯0x30ï¼Œè®¢é˜…è¯·æ±‚0x82ï¼Œå¿ƒè·³è¯·æ±‚0xC0
+            //ç¬¬1ç§ï¼š0x10 è¿æ¥æŠ¥æ–‡
+            //ç¬¬2ç§ï¼š0x82 è®¢é˜…æŠ¥æ–‡ï¼Œä¸”ConnectPack_flagç½®ä½ï¼Œè¡¨ç¤ºè¿æ¥æŠ¥æ–‡æˆåŠŸ
+            //ç¬¬3ç§ï¼šSubcribePack_flagç½®ä½ï¼Œè¯´æ˜è¿æ¥å’Œè®¢é˜…å‡æˆåŠŸï¼Œå…¶ä»–æŠ¥æ–‡å¯å‘
             if((DMA_flag == 0) && ((MQTT_TxDataOutPtr[2] == 0x10) || ((MQTT_TxDataOutPtr[2] == 0x82) && (ConnectPack_flag == 1)) || (SubcribePack_flag == 1)))
             {
-                MQTT_TxData(MQTT_TxDataOutPtr);                       //·¢ËÍÊı¾İ
-                MQTT_TxDataOutPtr += TBUFF_UNIT;                      //Ö¸ÕëÏÂÒÆ
-                if(MQTT_TxDataOutPtr == MQTT_TxDataEndPtr)            //Èç¹ûÖ¸Õëµ½»º³åÇøÎ²²¿ÁË
-                    MQTT_TxDataOutPtr = MQTT_TxDataBuf[0];            //Ö¸Õë¹éÎ»µ½»º³åÇø¿ªÍ·
+                MQTT_TxData(MQTT_TxDataOutPtr);                       //å‘é€æ•°æ®
+                MQTT_TxDataOutPtr += TBUFF_UNIT;                      //æŒ‡é’ˆä¸‹ç§»
+                if(MQTT_TxDataOutPtr == MQTT_TxDataEndPtr)            //å¦‚æœæŒ‡é’ˆåˆ°ç¼“å†²åŒºå°¾éƒ¨äº†
+                    MQTT_TxDataOutPtr = MQTT_TxDataBuf[0];            //æŒ‡é’ˆå½’ä½åˆ°ç¼“å†²åŒºå¼€å¤´
             }
-        }//´¦Àí·¢ËÍ»º³åÇøÊı¾İµÄelse if·ÖÖ§½áÎ²
+        }//å¤„ç†å‘é€ç¼“å†²åŒºæ•°æ®çš„else ifåˆ†æ”¯ç»“å°¾
         /*-------------------------------------------------------------*/
-        /*                     ´¦Àí½ÓÊÕ»º³åÇøÊı¾İ                      */
+        /*                     å¤„ç†æ¥æ”¶ç¼“å†²åŒºæ•°æ®                      */
         /*-------------------------------------------------------------*/
-        if(MQTT_RxDataOutPtr != MQTT_RxDataInPtr)                 //if³ÉÁ¢µÄ»°£¬ËµÃ÷½ÓÊÕ»º³åÇøÓĞÊı¾İÁË
+        if(MQTT_RxDataOutPtr != MQTT_RxDataInPtr)                 //ifæˆç«‹çš„è¯ï¼Œè¯´æ˜æ¥æ”¶ç¼“å†²åŒºæœ‰æ•°æ®äº†
         {
 						#if mqtt_debug
-							IotDebug_prinf("½ÓÊÕµ½Êı¾İ:");                             //´®¿ÚÌáÊ¾ĞÅÏ¢
+							IotDebug_prinf("æ¥æ”¶åˆ°æ•°æ®:");                             //ä¸²å£æç¤ºä¿¡æ¯
 						#endif
             /*-----------------------------------------------------*/
-            /*                    ´¦ÀíCONNACK±¨ÎÄ                  */
+            /*                    å¤„ç†CONNACKæŠ¥æ–‡                  */
             /*-----------------------------------------------------*/
-            //ifÅĞ¶Ï£¬Èç¹ûµÚÒ»¸ö×Ö½ÚÊÇ0x20£¬±íÊ¾ÊÕµ½µÄÊÇCONNACK±¨ÎÄ
-            //½Ó×ÅÎÒÃÇÒªÅĞ¶ÏµÚ4¸ö×Ö½Ú£¬¿´¿´CONNECT±¨ÎÄÊÇ·ñ³É¹¦
+            //ifåˆ¤æ–­ï¼Œå¦‚æœç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯0x20ï¼Œè¡¨ç¤ºæ”¶åˆ°çš„æ˜¯CONNACKæŠ¥æ–‡
+            //æ¥ç€æˆ‘ä»¬è¦åˆ¤æ–­ç¬¬4ä¸ªå­—èŠ‚ï¼Œçœ‹çœ‹CONNECTæŠ¥æ–‡æ˜¯å¦æˆåŠŸ
             if(MQTT_RxDataOutPtr[2] == 0x20)
             {
                 switch(MQTT_RxDataOutPtr[5])
@@ -104,54 +104,54 @@ void Connect_server(void)
                 case 0x00 :
 									
 										#if mqtt_debug
-											IotDebug_prinf("CONNECT±¨ÎÄ³É¹¦\r\n");                            //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("CONNECTæŠ¥æ–‡æˆåŠŸ\r\n");                            //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectPack_flag = 1;                                        //CONNECT±¨ÎÄ³É¹¦
-                    Mqtt_SubscribeMessage_To_Buff(S_TOPIC_NAME, 0);	                            //·¢ËÍ»º³åÇøÌí¼Ó¶©ÔÄtopic£¬µÈ¼¶0
-                    break;                                                       //Ìø³ö·ÖÖ§case 0x00
+                    ConnectPack_flag = 1;                                        //CONNECTæŠ¥æ–‡æˆåŠŸ
+                    Mqtt_SubscribeMessage_To_Buff(S_TOPIC_NAME, 0);	                            //å‘é€ç¼“å†²åŒºæ·»åŠ è®¢é˜…topicï¼Œç­‰çº§0
+                    break;                                                       //è·³å‡ºåˆ†æ”¯case 0x00
                 case 0x01 :
 										#if mqtt_debug
-											IotDebug_prinf("Á¬½ÓÒÑ¾Ü¾ø£¬²»Ö§³ÖµÄĞ­Òé°æ±¾£¬×¼±¸ÖØÆô\r\n");     //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è¿æ¥å·²æ‹’ç»ï¼Œä¸æ”¯æŒçš„åè®®ç‰ˆæœ¬ï¼Œå‡†å¤‡é‡å¯\r\n");     //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectALi_flag = 0;                                            //ConnectALi_flagÖÃÁã£¬ÖØÆôÁ¬½Ó
-                    break;                                                       //Ìø³ö·ÖÖ§case 0x01
+                    ConnectALi_flag = 0;                                            //ConnectALi_flagç½®é›¶ï¼Œé‡å¯è¿æ¥
+                    break;                                                       //è·³å‡ºåˆ†æ”¯case 0x01
                 case 0x02 :
 										#if mqtt_debug
-											IotDebug_prinf("Á¬½ÓÒÑ¾Ü¾ø£¬²»ºÏ¸ñµÄ¿Í»§¶Ë±êÊ¶·û£¬×¼±¸ÖØÆô\r\n"); //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è¿æ¥å·²æ‹’ç»ï¼Œä¸åˆæ ¼çš„å®¢æˆ·ç«¯æ ‡è¯†ç¬¦ï¼Œå‡†å¤‡é‡å¯\r\n"); //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectALi_flag = 0;                                            //ConnectALi_flagÖÃÁã£¬ÖØÆôÁ¬½Ó
-                    break;                                                       //Ìø³ö·ÖÖ§case 0x02
+                    ConnectALi_flag = 0;                                            //ConnectALi_flagç½®é›¶ï¼Œé‡å¯è¿æ¥
+                    break;                                                       //è·³å‡ºåˆ†æ”¯case 0x02
                 case 0x03 :
 										#if mqtt_debug
-											IotDebug_prinf("Á¬½ÓÒÑ¾Ü¾ø£¬·şÎñ¶Ë²»¿ÉÓÃ£¬×¼±¸ÖØÆô\r\n");         //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è¿æ¥å·²æ‹’ç»ï¼ŒæœåŠ¡ç«¯ä¸å¯ç”¨ï¼Œå‡†å¤‡é‡å¯\r\n");         //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectALi_flag = 0;                                            //ConnectALi_flagÖÃÁã£¬ÖØÆôÁ¬½Ó
-                    break;                                                       //Ìø³ö·ÖÖ§case 0x03
+                    ConnectALi_flag = 0;                                            //ConnectALi_flagç½®é›¶ï¼Œé‡å¯è¿æ¥
+                    break;                                                       //è·³å‡ºåˆ†æ”¯case 0x03
                 case 0x04 :
 										#if mqtt_debug
-											IotDebug_prinf("Á¬½ÓÒÑ¾Ü¾ø£¬ÎŞĞ§µÄÓÃ»§Ãû»òÃÜÂë£¬×¼±¸ÖØÆô\r\n");   //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è¿æ¥å·²æ‹’ç»ï¼Œæ— æ•ˆçš„ç”¨æˆ·åæˆ–å¯†ç ï¼Œå‡†å¤‡é‡å¯\r\n");   //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectALi_flag = 0;                                            //ConnectALi_flagÖÃÁã£¬ÖØÆôÁ¬½Ó
-                    break;                                                       //Ìø³ö·ÖÖ§case 0x04
+                    ConnectALi_flag = 0;                                            //ConnectALi_flagç½®é›¶ï¼Œé‡å¯è¿æ¥
+                    break;                                                       //è·³å‡ºåˆ†æ”¯case 0x04
                 case 0x05 :
 										#if mqtt_debug
-											IotDebug_prinf("Á¬½ÓÒÑ¾Ü¾ø£¬Î´ÊÚÈ¨£¬×¼±¸ÖØÆô\r\n");               //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è¿æ¥å·²æ‹’ç»ï¼Œæœªæˆæƒï¼Œå‡†å¤‡é‡å¯\r\n");               //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectALi_flag = 0;                                            //ConnectALi_flagÖÃÁã£¬ÖØÆôÁ¬½Ó
-                    break;                                                       //Ìø³ö·ÖÖ§case 0x05
+                    ConnectALi_flag = 0;                                            //ConnectALi_flagç½®é›¶ï¼Œé‡å¯è¿æ¥
+                    break;                                                       //è·³å‡ºåˆ†æ”¯case 0x05
                 default   :
 										#if mqtt_debug
-											IotDebug_prinf("Á¬½ÓÒÑ¾Ü¾ø£¬Î´Öª×´Ì¬£¬×¼±¸ÖØÆô\r\n");             //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è¿æ¥å·²æ‹’ç»ï¼ŒæœªçŸ¥çŠ¶æ€ï¼Œå‡†å¤‡é‡å¯\r\n");             //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectALi_flag = 0;                                            //ConnectALi_flagÖÃÁã£¬ÖØÆôÁ¬½Ó
-                    break;                                                       //Ìø³ö·ÖÖ§case default
+                    ConnectALi_flag = 0;                                            //ConnectALi_flagç½®é›¶ï¼Œé‡å¯è¿æ¥
+                    break;                                                       //è·³å‡ºåˆ†æ”¯case default
                 }
             }
             /*-----------------------------------------------------*/
-            /*                    ´¦ÀíSUBACK±¨ÎÄ                   */
+            /*                    å¤„ç†SUBACKæŠ¥æ–‡                   */
             /*-----------------------------------------------------*/
-            //ifÅĞ¶Ï£¬µÚÒ»¸ö×Ö½ÚÊÇ0x90£¬±íÊ¾ÊÕµ½µÄÊÇSUBACK±¨ÎÄ
-            //½Ó×ÅÎÒÃÇÒªÅĞ¶Ï¶©ÔÄ»Ø¸´£¬¿´¿´ÊÇ²»ÊÇ³É¹¦
+            //ifåˆ¤æ–­ï¼Œç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯0x90ï¼Œè¡¨ç¤ºæ”¶åˆ°çš„æ˜¯SUBACKæŠ¥æ–‡
+            //æ¥ç€æˆ‘ä»¬è¦åˆ¤æ–­è®¢é˜…å›å¤ï¼Œçœ‹çœ‹æ˜¯ä¸æ˜¯æˆåŠŸ
             else if(MQTT_RxDataOutPtr[2] == 0x90)
             {
                 switch(MQTT_RxDataOutPtr[6])
@@ -159,220 +159,220 @@ void Connect_server(void)
                 case 0x00 :
                 case 0x01 :
 										#if mqtt_debug
-											IotDebug_prinf("¶©ÔÄ³É¹¦\r\n");             //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è®¢é˜…æˆåŠŸ\r\n");             //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    SubcribePack_flag = 1;                //SubcribePack_flagÖÃ1£¬±íÊ¾¶©ÔÄ±¨ÎÄ³É¹¦ËÍ
-										TIM3_ENABLE_10MS();										// Æô¶¯¶¨Ê±Æ÷ ´Î¶¨Ê±Æ÷ÓÃÀ´ÉèÖÃ·¢ËÍÊı¾İµÄ¼ÆÊ±ºÍPTNG±¨ÎÄµÄ¼ÆÊ±
+                    SubcribePack_flag = 1;                //SubcribePack_flagç½®1ï¼Œè¡¨ç¤ºè®¢é˜…æŠ¥æ–‡æˆåŠŸé€
+										TIM3_ENABLE_10MS();										// å¯åŠ¨å®šæ—¶å™¨ æ¬¡å®šæ—¶å™¨ç”¨æ¥è®¾ç½®å‘é€æ•°æ®çš„è®¡æ—¶å’ŒPTNGæŠ¥æ–‡çš„è®¡æ—¶
 
-                    break;                                //Ìø³ö·ÖÖ§
+                    break;                                //è·³å‡ºåˆ†æ”¯
                 default   :
 										#if mqtt_debug
-											IotDebug_prinf("¶©ÔÄÊ§°Ü£¬×¼±¸ÖØÆô\r\n");   //´®¿ÚÊä³öĞÅÏ¢
+											IotDebug_prinf("è®¢é˜…å¤±è´¥ï¼Œå‡†å¤‡é‡å¯\r\n");   //ä¸²å£è¾“å‡ºä¿¡æ¯
 										#endif
-                    ConnectALi_flag = 0;                     //ConnectALi_flagÖÃÁã£¬ÖØÆôÁ¬½Ó
-                    break;                                //Ìø³ö·ÖÖ§
+                    ConnectALi_flag = 0;                     //ConnectALi_flagç½®é›¶ï¼Œé‡å¯è¿æ¥
+                    break;                                //è·³å‡ºåˆ†æ”¯
                 }
             }
             /*-----------------------------------------------------*/
-            /*                  ´¦ÀíPINGRESP±¨ÎÄ                   */
+            /*                  å¤„ç†PINGRESPæŠ¥æ–‡                   */
             /*-----------------------------------------------------*/
-            //ifÅĞ¶Ï£¬µÚÒ»¸ö×Ö½ÚÊÇ0xD0£¬±íÊ¾ÊÕµ½µÄÊÇPINGRESP±¨ÎÄ
+            //ifåˆ¤æ–­ï¼Œç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯0xD0ï¼Œè¡¨ç¤ºæ”¶åˆ°çš„æ˜¯PINGRESPæŠ¥æ–‡
             else if(MQTT_RxDataOutPtr[2] == 0xD0)
             {
 								#if mqtt_debug
-									IotDebug_prinf("PING±¨ÎÄ»Ø¸´\r\n"); 		  //´®¿ÚÊä³öĞÅÏ¢
+									IotDebug_prinf("PINGæŠ¥æ–‡å›å¤\r\n"); 		  //ä¸²å£è¾“å‡ºä¿¡æ¯
 								#endif
-                if(Ping_flag == 1)                    //Èç¹ûPing_flag=1£¬±íÊ¾µÚÒ»´Î·¢ËÍ
+                if(Ping_flag == 1)                    //å¦‚æœPing_flag=1ï¼Œè¡¨ç¤ºç¬¬ä¸€æ¬¡å‘é€
                 {
-                    Ping_flag = 0;    				  //ÒªÇå³ıPing_flag±êÖ¾
+                    Ping_flag = 0;    				  //è¦æ¸…é™¤Ping_flagæ ‡å¿—
                 }
-                else if(Ping_flag > 1)  				 //Èç¹ûPing_flag>1£¬±íÊ¾ÊÇ¶à´Î·¢ËÍÁË£¬¶øÇÒÊÇ2s¼ä¸ôµÄ¿ìËÙ·¢ËÍ
+                else if(Ping_flag > 1)  				 //å¦‚æœPing_flag>1ï¼Œè¡¨ç¤ºæ˜¯å¤šæ¬¡å‘é€äº†ï¼Œè€Œä¸”æ˜¯2sé—´éš”çš„å¿«é€Ÿå‘é€
                 {
-                    Ping_flag = 0;     				  //ÒªÇå³ıPing_flag±êÖ¾
-										Length_of_time = 3000;      //ÖØĞÂÉèÖÃPING±¨ÎÄµÄ¸üĞÂÊ±¼äÎª30S
+                    Ping_flag = 0;     				  //è¦æ¸…é™¤Ping_flagæ ‡å¿—
+										Length_of_time = 3000;      //é‡æ–°è®¾ç½®PINGæŠ¥æ–‡çš„æ›´æ–°æ—¶é—´ä¸º30S
                 }
             }
             /*-----------------------------------------------------*/
-            /*                  ´¦ÀíÊı¾İÍÆËÍ±¨ÎÄ                   */
+            /*                  å¤„ç†æ•°æ®æ¨é€æŠ¥æ–‡                   */
             /*-----------------------------------------------------*/
-            //ifÅĞ¶Ï£¬Èç¹ûµÚÒ»¸ö×Ö½ÚÊÇ0x30£¬±íÊ¾ÊÕµ½µÄÊÇ·şÎñÆ÷·¢À´µÄÍÆËÍÊı¾İ
-            //ÎÒÃÇÒªÌáÈ¡¿ØÖÆÃüÁî
+            //ifåˆ¤æ–­ï¼Œå¦‚æœç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯0x30ï¼Œè¡¨ç¤ºæ”¶åˆ°çš„æ˜¯æœåŠ¡å™¨å‘æ¥çš„æ¨é€æ•°æ®
+            //æˆ‘ä»¬è¦æå–æ§åˆ¶å‘½ä»¤
             else if(MQTT_RxDataOutPtr[2] == 0x30)
             {
 								#if mqtt_debug
-									IotDebug_prinf("·şÎñÆ÷µÈ¼¶0ÍÆËÍ\r\n"); 		   //´®¿ÚÊä³öĞÅÏ¢
+									IotDebug_prinf("æœåŠ¡å™¨ç­‰çº§0æ¨é€\r\n"); 		   //ä¸²å£è¾“å‡ºä¿¡æ¯
 								#endif
-                Mqtt_RxBuffData_To_CmdBuffData(MQTT_RxDataOutPtr);  //´¦ÀíµÈ¼¶0ÍÆËÍÊı¾İ
+                Mqtt_RxBuffData_To_CmdBuffData(MQTT_RxDataOutPtr);  //å¤„ç†ç­‰çº§0æ¨é€æ•°æ®
             }
 
-            MQTT_RxDataOutPtr += RBUFF_UNIT;                    //½ÓÊÕÖ¸ÕëÏÂÒÆ
-            if(MQTT_RxDataOutPtr == MQTT_RxDataEndPtr)          //Èç¹û½ÓÊÕÖ¸Õëµ½½ÓÊÕ»º³åÇøÎ²²¿ÁË
-                MQTT_RxDataOutPtr = MQTT_RxDataBuf[0];          //½ÓÊÕÖ¸Õë¹éÎ»µ½½ÓÊÕ»º³åÇø¿ªÍ·
+            MQTT_RxDataOutPtr += RBUFF_UNIT;                    //æ¥æ”¶æŒ‡é’ˆä¸‹ç§»
+            if(MQTT_RxDataOutPtr == MQTT_RxDataEndPtr)          //å¦‚æœæ¥æ”¶æŒ‡é’ˆåˆ°æ¥æ”¶ç¼“å†²åŒºå°¾éƒ¨äº†
+                MQTT_RxDataOutPtr = MQTT_RxDataBuf[0];          //æ¥æ”¶æŒ‡é’ˆå½’ä½åˆ°æ¥æ”¶ç¼“å†²åŒºå¼€å¤´
         }
 
         /*-------------------------------------------------------------*/
-        /*                     ´¦ÀíÃüÁî»º³åÇøÊı¾İ                      */
+        /*                     å¤„ç†å‘½ä»¤ç¼“å†²åŒºæ•°æ®                      */
         /*-------------------------------------------------------------*/
-        if(MQTT_CMDOutPtr != MQTT_CMDInPtr)                              //if³ÉÁ¢µÄ»°£¬ËµÃ÷ÃüÁî»º³åÇøÓĞÊı¾İÁË
+        if(MQTT_CMDOutPtr != MQTT_CMDInPtr)                              //ifæˆç«‹çš„è¯ï¼Œè¯´æ˜å‘½ä»¤ç¼“å†²åŒºæœ‰æ•°æ®äº†
         {
             ITO_GetCmdData_Deal();
-        }//´¦ÀíÃüÁî»º³åÇøÊı¾İµÄelse if·ÖÖ§½áÎ²
+        }//å¤„ç†å‘½ä»¤ç¼“å†²åŒºæ•°æ®çš„else ifåˆ†æ”¯ç»“å°¾
 
         /*-------------------------------------------------------------*/
-        /*                     ´¦Àí¶¨Ê±ÉÏ´«ÈÎÎñ!!                        */
+        /*                     å¤„ç†å®šæ—¶ä¸Šä¼ ä»»åŠ¡!!                        */
         /*-------------------------------------------------------------*/
 				Timed_Data_UpLoad();
 
 
     }
     /*--------------------------------------------------------------------*/
-    /*         ConnectALi_flag=0Í¬·şÎñÆ÷¶Ï¿ªÁËÁ¬½Ó,ÎÒÃÇÒªÁ¬½Ó·şÎñÆ÷          */
+    /*         ConnectALi_flag=0åŒæœåŠ¡å™¨æ–­å¼€äº†è¿æ¥,æˆ‘ä»¬è¦è¿æ¥æœåŠ¡å™¨          */
     /*--------------------------------------------------------------------*/
     else
     {
         #if mqtt_debug
-            IotDebug_prinf("×¼±¸Á¬½Ó·şÎñÆ÷\r\n");                  //´®¿ÚÊä³öĞÅÏ¢
+            IotDebug_prinf("å‡†å¤‡è¿æ¥æœåŠ¡å™¨\r\n");                  //ä¸²å£è¾“å‡ºä¿¡æ¯
         #endif
-        Usart2_Init(115200);                             //´®¿Ú2¹¦ÄÜ³õÊ¼»¯£¬²¨ÌØÂÊ115200
-        TIM_Cmd(TIM3, DISABLE);                          //¹Ø±ÕTIM3
-        TIM_Cmd(TIM2, DISABLE);                          //¹Ø±ÕTIM2
+        Usart2_Init(115200);                             //ä¸²å£2åŠŸèƒ½åˆå§‹åŒ–ï¼Œæ³¢ç‰¹ç‡115200
+        TIM_Cmd(TIM3, DISABLE);                          //å…³é—­TIM3
+        TIM_Cmd(TIM2, DISABLE);                          //å…³é—­TIM2
 				SystemTimer=0;
-        WiFi_RxCounter = 0;                              //WiFi½ÓÊÕÊı¾İÁ¿±äÁ¿ÇåÁã
-        memset(WiFi_RX_BUF, 0, WiFi_RXBUFF_SIZE);        //Çå¿ÕWiFi½ÓÊÕ»º³åÇø
-        if(WiFi_Connect_IoTServer() == 0)    			   //Èç¹ûWiFiÁ¬½ÓÔÆ·şÎñÆ÷º¯Êı·µ»Ø0£¬±íÊ¾ÕıÈ·£¬½øÈëif
+        WiFi_RxCounter = 0;                              //WiFiæ¥æ”¶æ•°æ®é‡å˜é‡æ¸…é›¶
+        memset(WiFi_RX_BUF, 0, WiFi_RXBUFF_SIZE);        //æ¸…ç©ºWiFiæ¥æ”¶ç¼“å†²åŒº
+        if(WiFi_Connect_IoTServer() == 0)    			   //å¦‚æœWiFiè¿æ¥äº‘æœåŠ¡å™¨å‡½æ•°è¿”å›0ï¼Œè¡¨ç¤ºæ­£ç¡®ï¼Œè¿›å…¥if
         {
 						#if mqtt_debug
-							IotDebug_prinf("Á¬½Ó·şÎñÆ÷³É¹¦\r\n");              //´®¿ÚÊä³öĞÅÏ¢
+							IotDebug_prinf("è¿æ¥æœåŠ¡å™¨æˆåŠŸ\r\n");              //ä¸²å£è¾“å‡ºä¿¡æ¯
 						#endif
-            Usart2_IDELInit(115200);                     //´®¿Ú2 ¿ªÆôDMA ºÍ ¿ÕÏĞÖĞ¶Ï
-            ConnectALi_flag = 1;                            //ConnectALi_flagÖÃ1£¬±íÊ¾Á¬½Ó³É¹¦
-            WiFi_RxCounter = 0;                          //WiFi½ÓÊÕÊı¾İÁ¿±äÁ¿ÇåÁã
-            memset(WiFi_RX_BUF, 0, WiFi_RXBUFF_SIZE);    //Çå¿ÕWiFi½ÓÊÕ»º³åÇø
-            MQTT_Buff_Init();                            //³õÊ¼»¯·¢ËÍ½ÓÊÕÃüÁî»º³åÇø
+            Usart2_IDELInit(115200);                     //ä¸²å£2 å¼€å¯DMA å’Œ ç©ºé—²ä¸­æ–­
+            ConnectALi_flag = 1;                            //ConnectALi_flagç½®1ï¼Œè¡¨ç¤ºè¿æ¥æˆåŠŸ
+            WiFi_RxCounter = 0;                          //WiFiæ¥æ”¶æ•°æ®é‡å˜é‡æ¸…é›¶
+            memset(WiFi_RX_BUF, 0, WiFi_RXBUFF_SIZE);    //æ¸…ç©ºWiFiæ¥æ”¶ç¼“å†²åŒº
+            MQTT_Buff_Init();                            //åˆå§‹åŒ–å‘é€æ¥æ”¶å‘½ä»¤ç¼“å†²åŒº
         }
     }
 }
 
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£º³õÊ¼»¯½ÓÊÕ,·¢ËÍ,ÃüÁîÊı¾İµÄ »º³åÇø ÒÔ¼°¸÷×´Ì¬²ÎÊı  */
-/*²Î  Êı£ºÎŞ                                                */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šåˆå§‹åŒ–æ¥æ”¶,å‘é€,å‘½ä»¤æ•°æ®çš„ ç¼“å†²åŒº ä»¥åŠå„çŠ¶æ€å‚æ•°  */
+/*å‚  æ•°ï¼šæ—                                                 */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void MQTT_Buff_Init(void)
 {
-    MQTT_RxDataInPtr = MQTT_RxDataBuf[0];             //Ö¸Ïò·¢ËÍ»º³åÇø´æ·ÅÊı¾İµÄÖ¸Õë¹éÎ»
-    MQTT_RxDataOutPtr = MQTT_RxDataInPtr;             //Ö¸Ïò·¢ËÍ»º³åÇø¶ÁÈ¡Êı¾İµÄÖ¸Õë¹éÎ»
-    MQTT_RxDataEndPtr = MQTT_RxDataBuf[R_NUM - 1];    //Ö¸Ïò·¢ËÍ»º³åÇø½áÊøµÄÖ¸Õë¹éÎ»
+    MQTT_RxDataInPtr = MQTT_RxDataBuf[0];             //æŒ‡å‘å‘é€ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„æŒ‡é’ˆå½’ä½
+    MQTT_RxDataOutPtr = MQTT_RxDataInPtr;             //æŒ‡å‘å‘é€ç¼“å†²åŒºè¯»å–æ•°æ®çš„æŒ‡é’ˆå½’ä½
+    MQTT_RxDataEndPtr = MQTT_RxDataBuf[R_NUM - 1];    //æŒ‡å‘å‘é€ç¼“å†²åŒºç»“æŸçš„æŒ‡é’ˆå½’ä½
 
-    MQTT_TxDataInPtr = MQTT_TxDataBuf[0];             //Ö¸Ïò·¢ËÍ»º³åÇø´æ·ÅÊı¾İµÄÖ¸Õë¹éÎ»
-    MQTT_TxDataOutPtr = MQTT_TxDataInPtr;             //Ö¸Ïò·¢ËÍ»º³åÇø¶ÁÈ¡Êı¾İµÄÖ¸Õë¹éÎ»
-    MQTT_TxDataEndPtr = MQTT_TxDataBuf[T_NUM - 1];    //Ö¸Ïò·¢ËÍ»º³åÇø½áÊøµÄÖ¸Õë¹éÎ»
+    MQTT_TxDataInPtr = MQTT_TxDataBuf[0];             //æŒ‡å‘å‘é€ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„æŒ‡é’ˆå½’ä½
+    MQTT_TxDataOutPtr = MQTT_TxDataInPtr;             //æŒ‡å‘å‘é€ç¼“å†²åŒºè¯»å–æ•°æ®çš„æŒ‡é’ˆå½’ä½
+    MQTT_TxDataEndPtr = MQTT_TxDataBuf[T_NUM - 1];    //æŒ‡å‘å‘é€ç¼“å†²åŒºç»“æŸçš„æŒ‡é’ˆå½’ä½
 
-    MQTT_CMDInPtr = MQTT_CMDBuf[0];                   //Ö¸ÏòÃüÁî»º³åÇø´æ·ÅÊı¾İµÄÖ¸Õë¹éÎ»
-    MQTT_CMDOutPtr = MQTT_CMDInPtr;                   //Ö¸ÏòÃüÁî»º³åÇø¶ÁÈ¡Êı¾İµÄÖ¸Õë¹éÎ»
-    MQTT_CMDEndPtr = MQTT_CMDBuf[C_NUM - 1];          //Ö¸ÏòÃüÁî»º³åÇø½áÊøµÄÖ¸Õë¹éÎ»
+    MQTT_CMDInPtr = MQTT_CMDBuf[0];                   //æŒ‡å‘å‘½ä»¤ç¼“å†²åŒºå­˜æ”¾æ•°æ®çš„æŒ‡é’ˆå½’ä½
+    MQTT_CMDOutPtr = MQTT_CMDInPtr;                   //æŒ‡å‘å‘½ä»¤ç¼“å†²åŒºè¯»å–æ•°æ®çš„æŒ‡é’ˆå½’ä½
+    MQTT_CMDEndPtr = MQTT_CMDBuf[C_NUM - 1];          //æŒ‡å‘å‘½ä»¤ç¼“å†²åŒºç»“æŸçš„æŒ‡é’ˆå½’ä½
 		
-    Mqtt_ConnectMessege_To_Buff();                                //·¢ËÍ»º³åÇøÌí¼ÓÁ¬½Ó±¨ÎÄ
-    Ping_flag = ConnectPack_flag = SubcribePack_flag = 0;  //¸÷¸ö²ÎÊıÇåÁã
+    Mqtt_ConnectMessege_To_Buff();                                //å‘é€ç¼“å†²åŒºæ·»åŠ è¿æ¥æŠ¥æ–‡
+    Ping_flag = ConnectPack_flag = SubcribePack_flag = 0;  //å„ä¸ªå‚æ•°æ¸…é›¶
 }
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£º°¢ÀïÔÆ³õÊ¼»¯²ÎÊı£¬µÃµ½¿Í»§¶ËID£¬ÓÃ»§ÃûºÍÃÜÂë      */
-/*²Î  Êı£ºÎŞ                                                */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šé˜¿é‡Œäº‘åˆå§‹åŒ–å‚æ•°ï¼Œå¾—åˆ°å®¢æˆ·ç«¯IDï¼Œç”¨æˆ·åå’Œå¯†ç       */
+/*å‚  æ•°ï¼šæ—                                                 */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void AliIoT_Parameter_Init(void)
 {
-    char temp[128];                                                       //¼ÆËã¼ÓÃÜµÄÊ±ºò£¬ÁÙÊ±Ê¹ÓÃµÄ»º³åÇø
+    char temp[128];                                                       //è®¡ç®—åŠ å¯†çš„æ—¶å€™ï¼Œä¸´æ—¶ä½¿ç”¨çš„ç¼“å†²åŒº
 
-    memset(ClientID, 0, 128);                                             //¿Í»§¶ËIDµÄ»º³åÇøÈ«²¿ÇåÁã
-    sprintf(ClientID, "%s|securemode=3,signmethod=hmacsha1|", DEVICENAME); //¹¹½¨¿Í»§¶ËID£¬²¢´æÈë»º³åÇø
-    ClientID_len = strlen(ClientID);                                      //¼ÆËã¿Í»§¶ËIDµÄ³¤¶È
+    memset(ClientID, 0, 128);                                             //å®¢æˆ·ç«¯IDçš„ç¼“å†²åŒºå…¨éƒ¨æ¸…é›¶
+    sprintf(ClientID, "%s|securemode=3,signmethod=hmacsha1|", DEVICENAME); //æ„å»ºå®¢æˆ·ç«¯IDï¼Œå¹¶å­˜å…¥ç¼“å†²åŒº
+    ClientID_len = strlen(ClientID);                                      //è®¡ç®—å®¢æˆ·ç«¯IDçš„é•¿åº¦
 
-    memset(Username, 0, 128);                                             //ÓÃ»§ÃûµÄ»º³åÇøÈ«²¿ÇåÁã
-    sprintf(Username, "%s&%s", DEVICENAME, PRODUCTKEY);                   //¹¹½¨ÓÃ»§Ãû£¬²¢´æÈë»º³åÇø
-    Username_len = strlen(Username);                                      //¼ÆËãÓÃ»§ÃûµÄ³¤¶È
+    memset(Username, 0, 128);                                             //ç”¨æˆ·åçš„ç¼“å†²åŒºå…¨éƒ¨æ¸…é›¶
+    sprintf(Username, "%s&%s", DEVICENAME, PRODUCTKEY);                   //æ„å»ºç”¨æˆ·åï¼Œå¹¶å­˜å…¥ç¼“å†²åŒº
+    Username_len = strlen(Username);                                      //è®¡ç®—ç”¨æˆ·åçš„é•¿åº¦
 
-    memset(temp, 0, 128);                                                                    //ÁÙÊ±»º³åÇøÈ«²¿ÇåÁã
-    sprintf(temp, "clientId%sdeviceName%sproductKey%s", DEVICENAME, DEVICENAME, PRODUCTKEY); //¹¹½¨¼ÓÃÜÊ±µÄÃ÷ÎÄ
-    utils_hmac_sha1(temp, strlen(temp), Passward, DEVICESECRE, DEVICESECRE_LEN);             //ÒÔDeviceSecretÎªÃØÔ¿¶ÔtempÖĞµÄÃ÷ÎÄ£¬½øĞĞhmacsha1¼ÓÃÜ£¬½á¹û¾ÍÊÇÃÜÂë£¬²¢±£´æµ½»º³åÇøÖĞ
-    Passward_len = strlen(Passward);                                                         //¼ÆËãÓÃ»§ÃûµÄ³¤¶È
+    memset(temp, 0, 128);                                                                    //ä¸´æ—¶ç¼“å†²åŒºå…¨éƒ¨æ¸…é›¶
+    sprintf(temp, "clientId%sdeviceName%sproductKey%s", DEVICENAME, DEVICENAME, PRODUCTKEY); //æ„å»ºåŠ å¯†æ—¶çš„æ˜æ–‡
+    utils_hmac_sha1(temp, strlen(temp), Passward, DEVICESECRE, DEVICESECRE_LEN);             //ä»¥DeviceSecretä¸ºç§˜é’¥å¯¹tempä¸­çš„æ˜æ–‡ï¼Œè¿›è¡Œhmacsha1åŠ å¯†ï¼Œç»“æœå°±æ˜¯å¯†ç ï¼Œå¹¶ä¿å­˜åˆ°ç¼“å†²åŒºä¸­
+    Passward_len = strlen(Passward);                                                         //è®¡ç®—ç”¨æˆ·åçš„é•¿åº¦
 
     memset(ServerIP, 0, 128);
-    sprintf(ServerIP, "%s.iot-as-mqtt.cn-shanghai.aliyuncs.com", PRODUCTKEY);                //¹¹½¨·şÎñÆ÷ÓòÃû
-    ServerPort = 1883;                                                                       //·şÎñÆ÷¶Ë¿ÚºÅ1883
+    sprintf(ServerIP, "%s.iot-as-mqtt.cn-shanghai.aliyuncs.com", PRODUCTKEY);                //æ„å»ºæœåŠ¡å™¨åŸŸå
+    ServerPort = 1883;                                                                       //æœåŠ¡å™¨ç«¯å£å·1883
 #if mqtt_debug
-    IotDebug_prinf("·ş Îñ Æ÷£º%s:%d\r\n", ServerIP, ServerPort); //´®¿ÚÊä³öµ÷ÊÔĞÅÏ¢
-    IotDebug_prinf("¿Í»§¶ËID£º%s\r\n", ClientID);              //´®¿ÚÊä³öµ÷ÊÔĞÅÏ¢
-    IotDebug_prinf("ÓÃ »§ Ãû£º%s\r\n", Username);              //´®¿ÚÊä³öµ÷ÊÔĞÅÏ¢
-    IotDebug_prinf("ÃÜ    Âë£º%s\r\n", Passward);              //´®¿ÚÊä³öµ÷ÊÔĞÅÏ¢
+    IotDebug_prinf("æœ åŠ¡ å™¨ï¼š%s:%d\r\n", ServerIP, ServerPort); //ä¸²å£è¾“å‡ºè°ƒè¯•ä¿¡æ¯
+    IotDebug_prinf("å®¢æˆ·ç«¯IDï¼š%s\r\n", ClientID);              //ä¸²å£è¾“å‡ºè°ƒè¯•ä¿¡æ¯
+    IotDebug_prinf("ç”¨ æˆ· åï¼š%s\r\n", Username);              //ä¸²å£è¾“å‡ºè°ƒè¯•ä¿¡æ¯
+    IotDebug_prinf("å¯†    ç ï¼š%s\r\n", Passward);              //ä¸²å£è¾“å‡ºè°ƒè¯•ä¿¡æ¯
 #endif
 }
 
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£ºÁ¬½Ó·şÎñÆ÷±¨ÎÄ                                    */
-/*²Î  Êı£ºÎŞ                                                */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šè¿æ¥æœåŠ¡å™¨æŠ¥æ–‡                                    */
+/*å‚  æ•°ï¼šæ—                                                 */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void Mqtt_ConnectMessege_To_Buff(void)
 {
     int temp, Remaining_len;
 
-    Fixed_len = 1;                                                        //Á¬½Ó±¨ÎÄÖĞ£¬¹Ì¶¨±¨Í·³¤¶ÈÔİÊ±ÏÈ=1
-    Variable_len = 10;                                                    //Á¬½Ó±¨ÎÄÖĞ£¬¿É±ä±¨Í·³¤¶È=10
-    Payload_len = 2 + ClientID_len + 2 + Username_len + 2 + Passward_len; //Á¬½Ó±¨ÎÄÖĞ£¬¸ºÔØ³¤¶È
-    Remaining_len = Variable_len + Payload_len;                           //Ê£Óà³¤¶È=¿É±ä±¨Í·³¤¶È+¸ºÔØ³¤¶È
+    Fixed_len = 1;                                                        //è¿æ¥æŠ¥æ–‡ä¸­ï¼Œå›ºå®šæŠ¥å¤´é•¿åº¦æš‚æ—¶å…ˆ=1
+    Variable_len = 10;                                                    //è¿æ¥æŠ¥æ–‡ä¸­ï¼Œå¯å˜æŠ¥å¤´é•¿åº¦=10
+    Payload_len = 2 + ClientID_len + 2 + Username_len + 2 + Passward_len; //è¿æ¥æŠ¥æ–‡ä¸­ï¼Œè´Ÿè½½é•¿åº¦
+    Remaining_len = Variable_len + Payload_len;                           //å‰©ä½™é•¿åº¦=å¯å˜æŠ¥å¤´é•¿åº¦+è´Ÿè½½é•¿åº¦
 
-    mqtt_buff[0] = 0x10;                     //¹Ì¶¨±¨Í·µÚ1¸ö×Ö½Ú £º¹Ì¶¨0x01
-    do                                       //Ñ­»·´¦Àí¹Ì¶¨±¨Í·ÖĞµÄÊ£Óà³¤¶È×Ö½Ú£¬×Ö½ÚÁ¿¸ù¾İÊ£Óà×Ö½ÚµÄÕæÊµ³¤¶È±ä»¯
+    mqtt_buff[0] = 0x10;                     //å›ºå®šæŠ¥å¤´ç¬¬1ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x01
+    do                                       //å¾ªç¯å¤„ç†å›ºå®šæŠ¥å¤´ä¸­çš„å‰©ä½™é•¿åº¦å­—èŠ‚ï¼Œå­—èŠ‚é‡æ ¹æ®å‰©ä½™å­—èŠ‚çš„çœŸå®é•¿åº¦å˜åŒ–
     {
-        temp = Remaining_len % 128;          //Ê£Óà³¤¶ÈÈ¡Óà128
-        Remaining_len = Remaining_len / 128; //Ê£Óà³¤¶ÈÈ¡Õû128
+        temp = Remaining_len % 128;          //å‰©ä½™é•¿åº¦å–ä½™128
+        Remaining_len = Remaining_len / 128; //å‰©ä½™é•¿åº¦å–æ•´128
         if(Remaining_len > 0)
-            temp |= 0x80;                    //°´Ğ­ÒéÒªÇóÎ»7ÖÃÎ»
-        mqtt_buff[Fixed_len] = temp;         //Ê£Óà³¤¶È×Ö½Ú¼ÇÂ¼Ò»¸öÊı¾İ
-        Fixed_len++;	                     //¹Ì¶¨±¨Í·×Ü³¤¶È+1
+            temp |= 0x80;                    //æŒ‰åè®®è¦æ±‚ä½7ç½®ä½
+        mqtt_buff[Fixed_len] = temp;         //å‰©ä½™é•¿åº¦å­—èŠ‚è®°å½•ä¸€ä¸ªæ•°æ®
+        Fixed_len++;	                     //å›ºå®šæŠ¥å¤´æ€»é•¿åº¦+1
     }
-    while(Remaining_len > 0);                //Èç¹ûRemaining_len>0µÄ»°£¬ÔÙ´Î½øÈëÑ­»·
+    while(Remaining_len > 0);                //å¦‚æœRemaining_len>0çš„è¯ï¼Œå†æ¬¡è¿›å…¥å¾ªç¯
 
-    mqtt_buff[Fixed_len + 0] = 0x00; //¿É±ä±¨Í·µÚ1¸ö×Ö½Ú £º¹Ì¶¨0x00
-    mqtt_buff[Fixed_len + 1] = 0x04; //¿É±ä±¨Í·µÚ2¸ö×Ö½Ú £º¹Ì¶¨0x04
-    mqtt_buff[Fixed_len + 2] = 0x4D;	//¿É±ä±¨Í·µÚ3¸ö×Ö½Ú £º¹Ì¶¨0x4D
-    mqtt_buff[Fixed_len + 3] = 0x51;	//¿É±ä±¨Í·µÚ4¸ö×Ö½Ú £º¹Ì¶¨0x51
-    mqtt_buff[Fixed_len + 4] = 0x54;	//¿É±ä±¨Í·µÚ5¸ö×Ö½Ú £º¹Ì¶¨0x54
-    mqtt_buff[Fixed_len + 5] = 0x54;	//¿É±ä±¨Í·µÚ6¸ö×Ö½Ú £º¹Ì¶¨0x54
-    mqtt_buff[Fixed_len + 6] = 0x04;	//¿É±ä±¨Í·µÚ7¸ö×Ö½Ú £º¹Ì¶¨0x04
-    mqtt_buff[Fixed_len + 7] = 0xC2;	//¿É±ä±¨Í·µÚ8¸ö×Ö½Ú £ºÊ¹ÄÜÓÃ»§ÃûºÍÃÜÂëĞ£Ñé£¬²»Ê¹ÓÃÒÅÖö£¬²»±£Áô»á»°
-    mqtt_buff[Fixed_len + 8] = 0x00; 	//¿É±ä±¨Í·µÚ9¸ö×Ö½Ú £º±£»îÊ±¼ä¸ß×Ö½Ú 0x00
-    mqtt_buff[Fixed_len + 9] = 0x64;	//¿É±ä±¨Í·µÚ10¸ö×Ö½Ú£º±£»îÊ±¼ä¸ß×Ö½Ú 0x64   100s
+    mqtt_buff[Fixed_len + 0] = 0x00; //å¯å˜æŠ¥å¤´ç¬¬1ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x00
+    mqtt_buff[Fixed_len + 1] = 0x04; //å¯å˜æŠ¥å¤´ç¬¬2ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x04
+    mqtt_buff[Fixed_len + 2] = 0x4D;	//å¯å˜æŠ¥å¤´ç¬¬3ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x4D
+    mqtt_buff[Fixed_len + 3] = 0x51;	//å¯å˜æŠ¥å¤´ç¬¬4ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x51
+    mqtt_buff[Fixed_len + 4] = 0x54;	//å¯å˜æŠ¥å¤´ç¬¬5ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x54
+    mqtt_buff[Fixed_len + 5] = 0x54;	//å¯å˜æŠ¥å¤´ç¬¬6ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x54
+    mqtt_buff[Fixed_len + 6] = 0x04;	//å¯å˜æŠ¥å¤´ç¬¬7ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x04
+    mqtt_buff[Fixed_len + 7] = 0xC2;	//å¯å˜æŠ¥å¤´ç¬¬8ä¸ªå­—èŠ‚ ï¼šä½¿èƒ½ç”¨æˆ·åå’Œå¯†ç æ ¡éªŒï¼Œä¸ä½¿ç”¨é—å˜±ï¼Œä¸ä¿ç•™ä¼šè¯
+    mqtt_buff[Fixed_len + 8] = 0x00; 	//å¯å˜æŠ¥å¤´ç¬¬9ä¸ªå­—èŠ‚ ï¼šä¿æ´»æ—¶é—´é«˜å­—èŠ‚ 0x00
+    mqtt_buff[Fixed_len + 9] = 0x64;	//å¯å˜æŠ¥å¤´ç¬¬10ä¸ªå­—èŠ‚ï¼šä¿æ´»æ—¶é—´é«˜å­—èŠ‚ 0x64   100s
 
     /*     CLIENT_ID      */
-    mqtt_buff[Fixed_len + 10] = ClientID_len / 256;                			  			 //¿Í»§¶ËID³¤¶È¸ß×Ö½Ú
-    mqtt_buff[Fixed_len + 11] = ClientID_len % 256;               			  			 //¿Í»§¶ËID³¤¶ÈµÍ×Ö½Ú
-    memcpy(&mqtt_buff[Fixed_len + 12], ClientID, ClientID_len);                 			//¸´ÖÆ¹ıÀ´¿Í»§¶ËID×Ö´®
-    /*     ÓÃ»§Ãû        */
-    mqtt_buff[Fixed_len + 12 + ClientID_len] = Username_len / 256; 				  		 //ÓÃ»§Ãû³¤¶È¸ß×Ö½Ú
-    mqtt_buff[Fixed_len + 13 + ClientID_len] = Username_len % 256; 				 		 //ÓÃ»§Ãû³¤¶ÈµÍ×Ö½Ú
-    memcpy(&mqtt_buff[Fixed_len + 14 + ClientID_len], Username, Username_len);          //¸´ÖÆ¹ıÀ´ÓÃ»§Ãû×Ö´®
-    /*      ÃÜÂë        */
-    mqtt_buff[Fixed_len + 14 + ClientID_len + Username_len] = Passward_len / 256;			 //ÃÜÂë³¤¶È¸ß×Ö½Ú
-    mqtt_buff[Fixed_len + 15 + ClientID_len + Username_len] = Passward_len % 256;			 //ÃÜÂë³¤¶ÈµÍ×Ö½Ú
-    memcpy(&mqtt_buff[Fixed_len + 16 + ClientID_len + Username_len], Passward, Passward_len); //¸´ÖÆ¹ıÀ´ÃÜÂë×Ö´®
+    mqtt_buff[Fixed_len + 10] = ClientID_len / 256;                			  			 //å®¢æˆ·ç«¯IDé•¿åº¦é«˜å­—èŠ‚
+    mqtt_buff[Fixed_len + 11] = ClientID_len % 256;               			  			 //å®¢æˆ·ç«¯IDé•¿åº¦ä½å­—èŠ‚
+    memcpy(&mqtt_buff[Fixed_len + 12], ClientID, ClientID_len);                 			//å¤åˆ¶è¿‡æ¥å®¢æˆ·ç«¯IDå­—ä¸²
+    /*     ç”¨æˆ·å        */
+    mqtt_buff[Fixed_len + 12 + ClientID_len] = Username_len / 256; 				  		 //ç”¨æˆ·åé•¿åº¦é«˜å­—èŠ‚
+    mqtt_buff[Fixed_len + 13 + ClientID_len] = Username_len % 256; 				 		 //ç”¨æˆ·åé•¿åº¦ä½å­—èŠ‚
+    memcpy(&mqtt_buff[Fixed_len + 14 + ClientID_len], Username, Username_len);          //å¤åˆ¶è¿‡æ¥ç”¨æˆ·åå­—ä¸²
+    /*      å¯†ç         */
+    mqtt_buff[Fixed_len + 14 + ClientID_len + Username_len] = Passward_len / 256;			 //å¯†ç é•¿åº¦é«˜å­—èŠ‚
+    mqtt_buff[Fixed_len + 15 + ClientID_len + Username_len] = Passward_len % 256;			 //å¯†ç é•¿åº¦ä½å­—èŠ‚
+    memcpy(&mqtt_buff[Fixed_len + 16 + ClientID_len + Username_len], Passward, Passward_len); //å¤åˆ¶è¿‡æ¥å¯†ç å­—ä¸²
 
-    Mqtt_TxData_LoadBuff_Executive(mqtt_buff, Fixed_len + Variable_len + Payload_len);                  //¼ÓÈë·¢ËÍÊı¾İ»º³åÇø
+    Mqtt_TxData_LoadBuff_Executive(mqtt_buff, Fixed_len + Variable_len + Payload_len);                  //åŠ å…¥å‘é€æ•°æ®ç¼“å†²åŒº
 }
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£ºSUBSCRIBE¶©ÔÄtopic±¨ÎÄ                            */
-/*²Î  Êı£ºQoS£º¶©ÔÄµÈ¼¶                                     */
-/*²Î  Êı£ºtopic_name£º¶©ÔÄtopic±¨ÎÄÃû³Æ                     */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šSUBSCRIBEè®¢é˜…topicæŠ¥æ–‡                            */
+/*å‚  æ•°ï¼šQoSï¼šè®¢é˜…ç­‰çº§                                     */
+/*å‚  æ•°ï¼štopic_nameï¼šè®¢é˜…topicæŠ¥æ–‡åç§°                     */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void Mqtt_SubscribeMessage_To_Buff(char *topic_name, int QoS)
 {
-	int remaining_size;//Ê£Óà×Ö½Ú³¤¶È
+	int remaining_size;//å‰©ä½™å­—èŠ‚é•¿åº¦
 	int len;
 	 Fixed_len=1;
-	Variable_len = 2;	//SUBSCRIBE±¨ÎÄÖĞ£¬¿É±ä±¨Í·³¤¶È=2	
-	Payload_len = 2 + strlen(topic_name)+1; //¼ÆËãÓĞĞ§¸ººÉ³¤¶È = 2×Ö½Ú(topic_name³¤¶È)+ topic_name×Ö·û´®µÄ³¤¶È + 1×Ö½Ú·şÎñµÈ¼¶
+	Variable_len = 2;	//SUBSCRIBEæŠ¥æ–‡ä¸­ï¼Œå¯å˜æŠ¥å¤´é•¿åº¦=2	
+	Payload_len = 2 + strlen(topic_name)+1; //è®¡ç®—æœ‰æ•ˆè´Ÿè·é•¿åº¦ = 2å­—èŠ‚(topic_nameé•¿åº¦)+ topic_nameå­—ç¬¦ä¸²çš„é•¿åº¦ + 1å­—èŠ‚æœåŠ¡ç­‰çº§
 	remaining_size = Variable_len+Payload_len;	
 	mqtt_buff[0]=0x82;
 	while( remaining_size > 0)
@@ -390,86 +390,86 @@ void Mqtt_SubscribeMessage_To_Buff(char *topic_name, int QoS)
 		mqtt_buff[Fixed_len+2] = strlen(topic_name) /256;
 		mqtt_buff[Fixed_len+3] = strlen(topic_name) % 256;
     memcpy(&mqtt_buff[Fixed_len+4], topic_name,strlen(topic_name)); 
-		mqtt_buff[Fixed_len+4+strlen(topic_name)]=QoS; //¼ÓÉÏQOSµÈ¼¶
+		mqtt_buff[Fixed_len+4+strlen(topic_name)]=QoS; //åŠ ä¸ŠQOSç­‰çº§
 		 
 		Mqtt_TxData_LoadBuff_Executive(mqtt_buff, Fixed_len + Variable_len + Payload_len);  
 
 }
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£ºPING±¨ÎÄ£¬ĞÄÌø°ü                                  */
-/*²Î  Êı£ºÎŞ                                                */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šPINGæŠ¥æ–‡ï¼Œå¿ƒè·³åŒ…                                  */
+/*å‚  æ•°ï¼šæ—                                                 */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void Mqtt_PingMessage_To_Buff(void)
 {
-    mqtt_buff[0] = 0xC0;            //µÚ1¸ö×Ö½Ú £º¹Ì¶¨0xC0
-    mqtt_buff[1] = 0x00;            //µÚ2¸ö×Ö½Ú £º¹Ì¶¨0x00
+    mqtt_buff[0] = 0xC0;            //ç¬¬1ä¸ªå­—èŠ‚ ï¼šå›ºå®š0xC0
+    mqtt_buff[1] = 0x00;            //ç¬¬2ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x00
 
-    Mqtt_TxData_LoadBuff_Executive(mqtt_buff, 2);   //¼ÓÈëÊı¾İµ½»º³åÇø
+    Mqtt_TxData_LoadBuff_Executive(mqtt_buff, 2);   //åŠ å…¥æ•°æ®åˆ°ç¼“å†²åŒº
 }
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£ºµÈ¼¶0 ·¢²¼ÏûÏ¢±¨ÎÄ   ±¾ÖÊÊÇ½«Òª·¢²¼µÄĞÅÏ¢µ½ÈİÆ÷ÖĞ*/
-//Í¨¹ıMQTT_TxData£¨£©º¯Êı·¢ËÍ
-/*²Î  Êı£ºtopic_name£ºtopicÃû³Æ                             */
-/*²Î  Êı£ºdata£ºÊı¾İ                                        */
-/*²Î  Êı£ºdata_len£ºÊı¾İ³¤¶È                                */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šç­‰çº§0 å‘å¸ƒæ¶ˆæ¯æŠ¥æ–‡   æœ¬è´¨æ˜¯å°†è¦å‘å¸ƒçš„ä¿¡æ¯åˆ°å®¹å™¨ä¸­*/
+//é€šè¿‡MQTT_TxDataï¼ˆï¼‰å‡½æ•°å‘é€
+/*å‚  æ•°ï¼štopic_nameï¼štopicåç§°                             */
+/*å‚  æ•°ï¼šdataï¼šæ•°æ®                                        */
+/*å‚  æ•°ï¼šdata_lenï¼šæ•°æ®é•¿åº¦                                */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void Mqtt_PublishQs0Message_To_Buff(char *topic, char *data, int data_len)
 {
     int temp, Remaining_len;
 
-    Fixed_len = 1;                              //¹Ì¶¨±¨Í·³¤¶ÈÔİÊ±ÏÈµÈÓÚ£º1×Ö½Ú
-    Variable_len = 2 + strlen(topic);           //¿É±ä±¨Í·³¤¶È£º2×Ö½Ú(topic³¤¶È)+ topic×Ö·û´®µÄ³¤¶È
-    Payload_len = data_len;                     //ÓĞĞ§¸ººÉ³¤¶È£º¾ÍÊÇdata_len
-    Remaining_len = Variable_len + Payload_len; //Ê£Óà³¤¶È=¿É±ä±¨Í·³¤¶È+¸ºÔØ³¤¶È
+    Fixed_len = 1;                              //å›ºå®šæŠ¥å¤´é•¿åº¦æš‚æ—¶å…ˆç­‰äºï¼š1å­—èŠ‚
+    Variable_len = 2 + strlen(topic);           //å¯å˜æŠ¥å¤´é•¿åº¦ï¼š2å­—èŠ‚(topicé•¿åº¦)+ topicå­—ç¬¦ä¸²çš„é•¿åº¦
+    Payload_len = data_len;                     //æœ‰æ•ˆè´Ÿè·é•¿åº¦ï¼šå°±æ˜¯data_len
+    Remaining_len = Variable_len + Payload_len; //å‰©ä½™é•¿åº¦=å¯å˜æŠ¥å¤´é•¿åº¦+è´Ÿè½½é•¿åº¦
 
-    mqtt_buff[0] = 0x30;                     //¹Ì¶¨±¨Í·µÚ1¸ö×Ö½Ú £º¹Ì¶¨0x30
-    do                                       //Ñ­»·´¦Àí¹Ì¶¨±¨Í·ÖĞµÄÊ£Óà³¤¶È×Ö½Ú£¬×Ö½ÚÁ¿¸ù¾İÊ£Óà×Ö½ÚµÄÕæÊµ³¤¶È±ä»¯
+    mqtt_buff[0] = 0x30;                     //å›ºå®šæŠ¥å¤´ç¬¬1ä¸ªå­—èŠ‚ ï¼šå›ºå®š0x30
+    do                                       //å¾ªç¯å¤„ç†å›ºå®šæŠ¥å¤´ä¸­çš„å‰©ä½™é•¿åº¦å­—èŠ‚ï¼Œå­—èŠ‚é‡æ ¹æ®å‰©ä½™å­—èŠ‚çš„çœŸå®é•¿åº¦å˜åŒ–
     {
-        temp = Remaining_len % 128;          //Ê£Óà³¤¶ÈÈ¡Óà128
-        Remaining_len = Remaining_len / 128; //Ê£Óà³¤¶ÈÈ¡Õû128
+        temp = Remaining_len % 128;          //å‰©ä½™é•¿åº¦å–ä½™128
+        Remaining_len = Remaining_len / 128; //å‰©ä½™é•¿åº¦å–æ•´128
         if(Remaining_len > 0)
-            temp |= 0x80;                    //°´Ğ­ÒéÒªÇóÎ»7ÖÃÎ»
-        mqtt_buff[Fixed_len] = temp;         //Ê£Óà³¤¶È×Ö½Ú¼ÇÂ¼Ò»¸öÊı¾İ
-        Fixed_len++;	                     //¹Ì¶¨±¨Í·×Ü³¤¶È+1
+            temp |= 0x80;                    //æŒ‰åè®®è¦æ±‚ä½7ç½®ä½
+        mqtt_buff[Fixed_len] = temp;         //å‰©ä½™é•¿åº¦å­—èŠ‚è®°å½•ä¸€ä¸ªæ•°æ®
+        Fixed_len++;	                     //å›ºå®šæŠ¥å¤´æ€»é•¿åº¦+1
     }
-    while(Remaining_len > 0);                //Èç¹ûRemaining_len>0µÄ»°£¬ÔÙ´Î½øÈëÑ­»·
+    while(Remaining_len > 0);                //å¦‚æœRemaining_len>0çš„è¯ï¼Œå†æ¬¡è¿›å…¥å¾ªç¯
 
-    mqtt_buff[Fixed_len + 0] = strlen(topic) / 256;                //¿É±ä±¨Í·µÚ1¸ö×Ö½Ú     £ºtopic³¤¶È¸ß×Ö½Ú
-    mqtt_buff[Fixed_len + 1] = strlen(topic) % 256;		         //¿É±ä±¨Í·µÚ2¸ö×Ö½Ú     £ºtopic³¤¶ÈµÍ×Ö½Ú
-    memcpy(&mqtt_buff[Fixed_len + 2], topic, strlen(topic));       //¿É±ä±¨Í·µÚ3¸ö×Ö½Ú¿ªÊ¼ £º¿½±´topic×Ö·û´®
-    memcpy(&mqtt_buff[Fixed_len + 2 + strlen(topic)], data, data_len); //ÓĞĞ§¸ººÉ£º¿½±´dataÊı¾İ
+    mqtt_buff[Fixed_len + 0] = strlen(topic) / 256;                //å¯å˜æŠ¥å¤´ç¬¬1ä¸ªå­—èŠ‚     ï¼štopicé•¿åº¦é«˜å­—èŠ‚
+    mqtt_buff[Fixed_len + 1] = strlen(topic) % 256;		         //å¯å˜æŠ¥å¤´ç¬¬2ä¸ªå­—èŠ‚     ï¼štopicé•¿åº¦ä½å­—èŠ‚
+    memcpy(&mqtt_buff[Fixed_len + 2], topic, strlen(topic));       //å¯å˜æŠ¥å¤´ç¬¬3ä¸ªå­—èŠ‚å¼€å§‹ ï¼šæ‹·è´topicå­—ç¬¦ä¸²
+    memcpy(&mqtt_buff[Fixed_len + 2 + strlen(topic)], data, data_len); //æœ‰æ•ˆè´Ÿè·ï¼šæ‹·è´dataæ•°æ®
 
-    Mqtt_TxData_LoadBuff_Executive(mqtt_buff, Fixed_len + Variable_len + Payload_len);  //¼ÓÈë·¢ËÍÊı¾İ»º³åÇø
+    Mqtt_TxData_LoadBuff_Executive(mqtt_buff, Fixed_len + Variable_len + Payload_len);  //åŠ å…¥å‘é€æ•°æ®ç¼“å†²åŒº
 }
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£º´¦Àí·şÎñÆ÷·¢À´µÄµÈ¼¶0µÄÍÆËÍ                       */
-/*²Î  Êı£ºredata£º½ÓÊÕµÄÊı¾İ                                */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šå¤„ç†æœåŠ¡å™¨å‘æ¥çš„ç­‰çº§0çš„æ¨é€                       */
+/*å‚  æ•°ï¼šredataï¼šæ¥æ”¶çš„æ•°æ®                                */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void Mqtt_RxBuffData_To_CmdBuffData(unsigned char *redata)
 {
-    int  re_len;               	           //¶¨ÒåÒ»¸ö±äÁ¿£¬´æ·Å½ÓÊÕµÄÊı¾İ×Ü³¤¶È
-    int  pack_num;                         //¶¨ÒåÒ»¸ö±äÁ¿£¬µ±¶à¸öÍÆËÍÒ»Æğ¹ıÀ´Ê±£¬±£´æÍÆËÍµÄ¸öÊı
-    int  temp, temp_len;                   //¶¨ÒåÒ»¸ö±äÁ¿£¬Ôİ´æÊı¾İ
-    int  totle_len;                        //¶¨ÒåÒ»¸ö±äÁ¿£¬´æ·ÅÒÑ¾­Í³¼ÆµÄÍÆËÍµÄ×ÜÊı¾İÁ¿
-    int  topic_len;              	       //¶¨ÒåÒ»¸ö±äÁ¿£¬´æ·ÅÍÆËÍÖĞÖ÷ÌâµÄ³¤¶È
-    int  cmd_len;                          //¶¨ÒåÒ»¸ö±äÁ¿£¬´æ·ÅÍÆËÍÖĞ°üº¬µÄÃüÁîÊı¾İµÄ³¤¶È
-    int  cmd_loca;                         //¶¨ÒåÒ»¸ö±äÁ¿£¬´æ·ÅÍÆËÍÖĞ°üº¬µÄÃüÁîµÄÆğÊ¼Î»ÖÃ
-    int  i;                                //¶¨ÒåÒ»¸ö±äÁ¿£¬ÓÃÓÚforÑ­»·
+    int  re_len;               	           //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œå­˜æ”¾æ¥æ”¶çš„æ•°æ®æ€»é•¿åº¦
+    int  pack_num;                         //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œå½“å¤šä¸ªæ¨é€ä¸€èµ·è¿‡æ¥æ—¶ï¼Œä¿å­˜æ¨é€çš„ä¸ªæ•°
+    int  temp, temp_len;                   //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œæš‚å­˜æ•°æ®
+    int  totle_len;                        //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œå­˜æ”¾å·²ç»ç»Ÿè®¡çš„æ¨é€çš„æ€»æ•°æ®é‡
+    int  topic_len;              	       //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œå­˜æ”¾æ¨é€ä¸­ä¸»é¢˜çš„é•¿åº¦
+    int  cmd_len;                          //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œå­˜æ”¾æ¨é€ä¸­åŒ…å«çš„å‘½ä»¤æ•°æ®çš„é•¿åº¦
+    int  cmd_loca;                         //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œå­˜æ”¾æ¨é€ä¸­åŒ…å«çš„å‘½ä»¤çš„èµ·å§‹ä½ç½®
+    int  i;                                //å®šä¹‰ä¸€ä¸ªå˜é‡ï¼Œç”¨äºforå¾ªç¯
     int  local, multiplier;
-    unsigned char tempbuff[RBUFF_UNIT];	   //ÁÙÊ±»º³åÇø
-    unsigned char *data;                   //redata¹ıÀ´µÄÊ±ºò£¬µÚÒ»¸ö×Ö½ÚÊÇÊı¾İ×ÜÁ¿£¬dataÓÃÓÚÖ¸ÏòredataµÄµÚ2¸ö×Ö½Ú£¬ÕæÕıµÄÊı¾İ¿ªÊ¼µÄµØ·½
+    unsigned char tempbuff[RBUFF_UNIT];	   //ä¸´æ—¶ç¼“å†²åŒº
+    unsigned char *data;                   //redataè¿‡æ¥çš„æ—¶å€™ï¼Œç¬¬ä¸€ä¸ªå­—èŠ‚æ˜¯æ•°æ®æ€»é‡ï¼Œdataç”¨äºæŒ‡å‘redataçš„ç¬¬2ä¸ªå­—èŠ‚ï¼ŒçœŸæ­£çš„æ•°æ®å¼€å§‹çš„åœ°æ–¹
 
-    re_len = redata[0] * 256 + redata[1];                           //»ñÈ¡½ÓÊÕµÄÊı¾İ×Ü³¤¶È
-    data = &redata[2];                                              //dataÖ¸ÏòredataµÄµÚ2¸ö×Ö½Ú£¬ÕæÕıµÄÊı¾İ¿ªÊ¼µÄ
-    pack_num = temp_len = totle_len = temp = 0;                	    //¸÷¸ö±äÁ¿ÇåÁã
+    re_len = redata[0] * 256 + redata[1];                           //è·å–æ¥æ”¶çš„æ•°æ®æ€»é•¿åº¦
+    data = &redata[2];                                              //dataæŒ‡å‘redataçš„ç¬¬2ä¸ªå­—èŠ‚ï¼ŒçœŸæ­£çš„æ•°æ®å¼€å§‹çš„
+    pack_num = temp_len = totle_len = temp = 0;                	    //å„ä¸ªå˜é‡æ¸…é›¶
     local = 1;
     multiplier = 1;
     do
     {
-        pack_num++;                                     			//¿ªÊ¼Ñ­»·Í³¼ÆÍÆËÍµÄ¸öÊı£¬Ã¿´ÎÑ­»·ÍÆËÍµÄ¸öÊı+1
+        pack_num++;                                     			//å¼€å§‹å¾ªç¯ç»Ÿè®¡æ¨é€çš„ä¸ªæ•°ï¼Œæ¯æ¬¡å¾ªç¯æ¨é€çš„ä¸ªæ•°+1
         do
         {
             temp = data[totle_len + local];
@@ -478,20 +478,20 @@ void Mqtt_RxBuffData_To_CmdBuffData(unsigned char *redata)
             local++;
         }
         while ((temp & 128) != 0);
-        totle_len += (temp_len + local);                          	//ÀÛ¼ÆÍ³¼ÆµÄ×ÜµÄÍÆËÍµÄÊı¾İ³¤¶È
-        re_len -= (temp_len + local) ;                              //½ÓÊÕµÄÊı¾İ×Ü³¤¶È ¼õÈ¥ ±¾´ÎÍ³¼ÆµÄÍÆËÍµÄ×Ü³¤¶È
+        totle_len += (temp_len + local);                          	//ç´¯è®¡ç»Ÿè®¡çš„æ€»çš„æ¨é€çš„æ•°æ®é•¿åº¦
+        re_len -= (temp_len + local) ;                              //æ¥æ”¶çš„æ•°æ®æ€»é•¿åº¦ å‡å» æœ¬æ¬¡ç»Ÿè®¡çš„æ¨é€çš„æ€»é•¿åº¦
         local = 1;
         multiplier = 1;
         temp_len = 0;
     }
-    while(re_len != 0);                                  			//Èç¹û½ÓÊÕµÄÊı¾İ×Ü³¤¶ÈµÈÓÚ0ÁË£¬ËµÃ÷Í³¼ÆÍê±ÏÁË
+    while(re_len != 0);                                  			//å¦‚æœæ¥æ”¶çš„æ•°æ®æ€»é•¿åº¦ç­‰äº0äº†ï¼Œè¯´æ˜ç»Ÿè®¡å®Œæ¯•äº†
 		#if mqtt_debug
-			IotDebug_prinf("±¾´Î½ÓÊÕÁË%d¸öÍÆËÍÊı¾İ\r\n", pack_num); //´®¿ÚÊä³öĞÅÏ¢
+			IotDebug_prinf("æœ¬æ¬¡æ¥æ”¶äº†%dä¸ªæ¨é€æ•°æ®\r\n", pack_num); //ä¸²å£è¾“å‡ºä¿¡æ¯
 		#endif
-    temp_len = totle_len = 0;                		            	//¸÷¸ö±äÁ¿ÇåÁã
+    temp_len = totle_len = 0;                		            	//å„ä¸ªå˜é‡æ¸…é›¶
     local = 1;
     multiplier = 1;
-    for(i = 0; i < pack_num; i++)                                   //ÒÑ¾­Í³¼Æµ½ÁË½ÓÊÕµÄÍÆËÍ¸öÊı£¬¿ªÊ¼forÑ­»·£¬È¡³öÃ¿¸öÍÆËÍµÄÊı¾İ
+    for(i = 0; i < pack_num; i++)                                   //å·²ç»ç»Ÿè®¡åˆ°äº†æ¥æ”¶çš„æ¨é€ä¸ªæ•°ï¼Œå¼€å§‹forå¾ªç¯ï¼Œå–å‡ºæ¯ä¸ªæ¨é€çš„æ•°æ®
     {
         do
         {
@@ -501,141 +501,141 @@ void Mqtt_RxBuffData_To_CmdBuffData(unsigned char *redata)
             local++;
         }
         while ((temp & 128) != 0);
-        topic_len = data[local + totle_len] * 256 + data[local + 1 + totle_len] + 2; //¼ÆËã±¾´ÎÍÆËÍÊı¾İÖĞÖ÷ÌâÕ¼ÓÃµÄÊı¾İÁ¿
-        cmd_len = temp_len - topic_len;                             //¼ÆËã±¾´ÎÍÆËÍÊı¾İÖĞÃüÁîÊı¾İÕ¼ÓÃµÄÊı¾İÁ¿
-        cmd_loca = totle_len + local +  topic_len;                  //¼ÆËã±¾´ÎÍÆËÍÊı¾İÖĞÃüÁîÊı¾İ¿ªÊ¼µÄÎ»ÖÃ
-        memcpy(tempbuff, &data[cmd_loca], cmd_len);                 //ÃüÁîÊı¾İ¿½±´³öÀ´
-        Mqtt_CmdData_LoadBuff_Executive(tempbuff, cmd_len);                             //¼ÓÈëÃüÁîµ½»º³åÇø
-        totle_len += (temp_len + local);                            //ÀÛ¼ÆÒÑ¾­Í³¼ÆµÄÍÆËÍµÄÊı¾İ³¤¶È
+        topic_len = data[local + totle_len] * 256 + data[local + 1 + totle_len] + 2; //è®¡ç®—æœ¬æ¬¡æ¨é€æ•°æ®ä¸­ä¸»é¢˜å ç”¨çš„æ•°æ®é‡
+        cmd_len = temp_len - topic_len;                             //è®¡ç®—æœ¬æ¬¡æ¨é€æ•°æ®ä¸­å‘½ä»¤æ•°æ®å ç”¨çš„æ•°æ®é‡
+        cmd_loca = totle_len + local +  topic_len;                  //è®¡ç®—æœ¬æ¬¡æ¨é€æ•°æ®ä¸­å‘½ä»¤æ•°æ®å¼€å§‹çš„ä½ç½®
+        memcpy(tempbuff, &data[cmd_loca], cmd_len);                 //å‘½ä»¤æ•°æ®æ‹·è´å‡ºæ¥
+        Mqtt_CmdData_LoadBuff_Executive(tempbuff, cmd_len);                             //åŠ å…¥å‘½ä»¤åˆ°ç¼“å†²åŒº
+        totle_len += (temp_len + local);                            //ç´¯è®¡å·²ç»ç»Ÿè®¡çš„æ¨é€çš„æ•°æ®é•¿åº¦
         local = 1;
         multiplier = 1;
         temp_len = 0;
     }
 }
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£º´¦Àí·¢ËÍ»º³åÇø //µ¥Æ¬»ú·¢ËÍµÄÊı¾İ¼ÓÔØµ½ÈİÆ÷ÖĞ                                   */
-/*²Î  Êı£ºdata£ºÊı¾İ                                        */
-/*²Î  Êı£ºsize£ºÊı¾İ³¤¶È                                    */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šå¤„ç†å‘é€ç¼“å†²åŒº //å•ç‰‡æœºå‘é€çš„æ•°æ®åŠ è½½åˆ°å®¹å™¨ä¸­                                   */
+/*å‚  æ•°ï¼šdataï¼šæ•°æ®                                        */
+/*å‚  æ•°ï¼šsizeï¼šæ•°æ®é•¿åº¦                                    */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void Mqtt_TxData_LoadBuff_Executive(unsigned char *data, int size)
 {
-    memcpy(&MQTT_TxDataInPtr[2], data, size);    //¿½±´Êı¾İµ½·¢ËÍ»º³åÇø
-    MQTT_TxDataInPtr[0] = size / 256;            //¼ÇÂ¼Êı¾İ³¤¶È
-    MQTT_TxDataInPtr[1] = size % 256;            //¼ÇÂ¼Êı¾İ³¤¶È
-    MQTT_TxDataInPtr += TBUFF_UNIT;               //Ö¸ÕëÏÂÒÆ
-    if(MQTT_TxDataInPtr == MQTT_TxDataEndPtr)    //Èç¹ûÖ¸Õëµ½»º³åÇøÎ²²¿ÁË
-        MQTT_TxDataInPtr = MQTT_TxDataBuf[0];    //Ö¸Õë¹éÎ»µ½»º³åÇø¿ªÍ·
+    memcpy(&MQTT_TxDataInPtr[2], data, size);    //æ‹·è´æ•°æ®åˆ°å‘é€ç¼“å†²åŒº
+    MQTT_TxDataInPtr[0] = size / 256;            //è®°å½•æ•°æ®é•¿åº¦
+    MQTT_TxDataInPtr[1] = size % 256;            //è®°å½•æ•°æ®é•¿åº¦
+    MQTT_TxDataInPtr += TBUFF_UNIT;               //æŒ‡é’ˆä¸‹ç§»
+    if(MQTT_TxDataInPtr == MQTT_TxDataEndPtr)    //å¦‚æœæŒ‡é’ˆåˆ°ç¼“å†²åŒºå°¾éƒ¨äº†
+        MQTT_TxDataInPtr = MQTT_TxDataBuf[0];    //æŒ‡é’ˆå½’ä½åˆ°ç¼“å†²åŒºå¼€å¤´
 }
 /*----------------------------------------------------------*/
-/*º¯ÊıÃû£º´¦ÀíÃüÁî»º³åÇø  ////½«ÃüÁî·ÅÈë»º´æÇøº¯Êı                                  */
-/*²Î  Êı£ºdata£ºÊı¾İ                                        */
-/*²Î  Êı£ºsize£ºÊı¾İ³¤¶È                                    */
-/*·µ»ØÖµ£ºÎŞ                                                */
+/*å‡½æ•°åï¼šå¤„ç†å‘½ä»¤ç¼“å†²åŒº  ////å°†å‘½ä»¤æ”¾å…¥ç¼“å­˜åŒºå‡½æ•°                                  */
+/*å‚  æ•°ï¼šdataï¼šæ•°æ®                                        */
+/*å‚  æ•°ï¼šsizeï¼šæ•°æ®é•¿åº¦                                    */
+/*è¿”å›å€¼ï¼šæ—                                                 */
 /*----------------------------------------------------------*/
 void Mqtt_CmdData_LoadBuff_Executive(unsigned char *data, int size)
 {
-    memcpy(&MQTT_CMDInPtr[2], data, size);    //¿½±´Êı¾İµ½ÃüÁî»º³åÇø
-    MQTT_CMDInPtr[0] = size / 256;            //¼ÇÂ¼Êı¾İ³¤¶È
-    MQTT_CMDInPtr[1] = size % 256;            //¼ÇÂ¼Êı¾İ³¤¶È
-    MQTT_CMDInPtr[size + 2] = '\0';           //¼ÓÈë×Ö·û´®½áÊø·û
-    MQTT_CMDInPtr += CBUFF_UNIT;               //Ö¸ÕëÏÂÒÆ
-    if(MQTT_CMDInPtr == MQTT_CMDEndPtr)       //Èç¹ûÖ¸Õëµ½»º³åÇøÎ²²¿ÁË
-        MQTT_CMDInPtr = MQTT_CMDBuf[0];       //Ö¸Õë¹éÎ»µ½»º³åÇø¿ªÍ·
+    memcpy(&MQTT_CMDInPtr[2], data, size);    //æ‹·è´æ•°æ®åˆ°å‘½ä»¤ç¼“å†²åŒº
+    MQTT_CMDInPtr[0] = size / 256;            //è®°å½•æ•°æ®é•¿åº¦
+    MQTT_CMDInPtr[1] = size % 256;            //è®°å½•æ•°æ®é•¿åº¦
+    MQTT_CMDInPtr[size + 2] = '\0';           //åŠ å…¥å­—ç¬¦ä¸²ç»“æŸç¬¦
+    MQTT_CMDInPtr += CBUFF_UNIT;               //æŒ‡é’ˆä¸‹ç§»
+    if(MQTT_CMDInPtr == MQTT_CMDEndPtr)       //å¦‚æœæŒ‡é’ˆåˆ°ç¼“å†²åŒºå°¾éƒ¨äº†
+        MQTT_CMDInPtr = MQTT_CMDBuf[0];       //æŒ‡é’ˆå½’ä½åˆ°ç¼“å†²åŒºå¼€å¤´
 }
 
 
-//½«´ÓÔÆ¶Ë½ÓÊÕµÄÊı¾İ¼ÓÔØµ½½ÓÊÕÈİÆ÷ÖĞ
-void Mqtt_RxData_LoadBuff_Executive(char *data, int size)//½«´ÓÔÆ¶Ë½ÓÊÕµÄÊı¾İ¼ÓÔØµ½½ÓÊÕÈİÆ÷ÖĞ
+//å°†ä»äº‘ç«¯æ¥æ”¶çš„æ•°æ®åŠ è½½åˆ°æ¥æ”¶å®¹å™¨ä¸­
+void Mqtt_RxData_LoadBuff_Executive(char *data, int size)//å°†ä»äº‘ç«¯æ¥æ”¶çš„æ•°æ®åŠ è½½åˆ°æ¥æ”¶å®¹å™¨ä¸­
 {
-     memcpy(&MQTT_RxDataInPtr[2], Usart2_RxBuff, Usart2_RxCounter);                    //¿½±´Êı¾İµ½½ÓÊÕ»º³åÇø
-     MQTT_RxDataInPtr[0] = Usart2_RxCounter / 256;                                     //¼ÇÂ¼Êı¾İ³¤¶È¸ß×Ö½Ú
-     MQTT_RxDataInPtr[1] = Usart2_RxCounter % 256;                                     //¼ÇÂ¼Êı¾İ³¤¶ÈµÍ×Ö½Ú
-     MQTT_RxDataInPtr += RBUFF_UNIT;                                                   //Ö¸ÕëÏÂÒÆ
-     if(MQTT_RxDataInPtr == MQTT_RxDataEndPtr)                                         //Èç¹ûÖ¸Õëµ½»º³åÇøÎ²²¿ÁË
+     memcpy(&MQTT_RxDataInPtr[2], Usart2_RxBuff, Usart2_RxCounter);                    //æ‹·è´æ•°æ®åˆ°æ¥æ”¶ç¼“å†²åŒº
+     MQTT_RxDataInPtr[0] = Usart2_RxCounter / 256;                                     //è®°å½•æ•°æ®é•¿åº¦é«˜å­—èŠ‚
+     MQTT_RxDataInPtr[1] = Usart2_RxCounter % 256;                                     //è®°å½•æ•°æ®é•¿åº¦ä½å­—èŠ‚
+     MQTT_RxDataInPtr += RBUFF_UNIT;                                                   //æŒ‡é’ˆä¸‹ç§»
+     if(MQTT_RxDataInPtr == MQTT_RxDataEndPtr)                                         //å¦‚æœæŒ‡é’ˆåˆ°ç¼“å†²åŒºå°¾éƒ¨äº†
          MQTT_RxDataInPtr = MQTT_RxDataBuf[0]; 
 }
 
 /*-------------------------------------------------*/
-/*¹¦ÄÜ£º´¦Àí·¢ËÍ»º³åÇøÊı¾İ//±¾ÖÊ½«·¢ËÍÈİÆ÷ÖĞÊı¾İ ·¢ËÍ³öÈ¥     					          */
-/*²Î  Êı£ºÎŞ                                       */
-/*·µ»ØÖµ£ºÎŞ                                       */
+/*åŠŸèƒ½ï¼šå¤„ç†å‘é€ç¼“å†²åŒºæ•°æ®//æœ¬è´¨å°†å‘é€å®¹å™¨ä¸­æ•°æ® å‘é€å‡ºå»     					          */
+/*å‚  æ•°ï¼šæ—                                        */
+/*è¿”å›å€¼ï¼šæ—                                        */
 /*-------------------------------------------------*/
 void TxBuff_DataSend(void)
 {
     /*-------------------------------------------------------------*/
-    /*                     ´¦Àí·¢ËÍ»º³åÇøÊı¾İ                      */
+    /*                     å¤„ç†å‘é€ç¼“å†²åŒºæ•°æ®                      */
     /*-------------------------------------------------------------*/
-    if(MQTT_TxDataOutPtr != MQTT_TxDataInPtr)                     //if³ÉÁ¢µÄ»°£¬ËµÃ÷·¢ËÍ»º³åÇøÓĞÊı¾İÁË
+    if(MQTT_TxDataOutPtr != MQTT_TxDataInPtr)                     //ifæˆç«‹çš„è¯ï¼Œè¯´æ˜å‘é€ç¼“å†²åŒºæœ‰æ•°æ®äº†
     {
-        //3ÖÖÇé¿ö¿É½øÈëif
-        //µÚ1ÖÖ£º0x10 Á¬½Ó±¨ÎÄ
-        //µÚ2ÖÖ£º0x82 ¶©ÔÄ±¨ÎÄ£¬ÇÒConnectPack_flagÖÃÎ»£¬±íÊ¾Á¬½Ó±¨ÎÄ³É¹¦
-        //µÚ3ÖÖ£ºSubcribePack_flagÖÃÎ»£¬ËµÃ÷Á¬½ÓºÍ¶©ÔÄ¾ù³É¹¦£¬ÆäËû±¨ÎÄ¿É·¢
+        //3ç§æƒ…å†µå¯è¿›å…¥if
+        //ç¬¬1ç§ï¼š0x10 è¿æ¥æŠ¥æ–‡
+        //ç¬¬2ç§ï¼š0x82 è®¢é˜…æŠ¥æ–‡ï¼Œä¸”ConnectPack_flagç½®ä½ï¼Œè¡¨ç¤ºè¿æ¥æŠ¥æ–‡æˆåŠŸ
+        //ç¬¬3ç§ï¼šSubcribePack_flagç½®ä½ï¼Œè¯´æ˜è¿æ¥å’Œè®¢é˜…å‡æˆåŠŸï¼Œå…¶ä»–æŠ¥æ–‡å¯å‘
         if((DMA_flag == 0) && ((MQTT_TxDataOutPtr[2] == 0x10) || ((MQTT_TxDataOutPtr[2] == 0x82) && (ConnectPack_flag == 1)) || (SubcribePack_flag == 1)))
         {
 						#if mqtt_debug
-							IotDebug_prinf("·¢ËÍÊı¾İ:0x%x\r\n", MQTT_TxDataOutPtr[2]); //´®¿ÚÌáÊ¾ĞÅÏ¢
+							IotDebug_prinf("å‘é€æ•°æ®:0x%x\r\n", MQTT_TxDataOutPtr[2]); //ä¸²å£æç¤ºä¿¡æ¯
 						#endif
-            MQTT_TxData(MQTT_TxDataOutPtr);                       //·¢ËÍÊı¾İ
-            MQTT_TxDataOutPtr += TBUFF_UNIT;                      //Ö¸ÕëÏÂÒÆ
-            if(MQTT_TxDataOutPtr == MQTT_TxDataEndPtr)            //Èç¹ûÖ¸Õëµ½»º³åÇøÎ²²¿ÁË
-                MQTT_TxDataOutPtr = MQTT_TxDataBuf[0];            //Ö¸Õë¹éÎ»µ½»º³åÇø¿ªÍ·
+            MQTT_TxData(MQTT_TxDataOutPtr);                       //å‘é€æ•°æ®
+            MQTT_TxDataOutPtr += TBUFF_UNIT;                      //æŒ‡é’ˆä¸‹ç§»
+            if(MQTT_TxDataOutPtr == MQTT_TxDataEndPtr)            //å¦‚æœæŒ‡é’ˆåˆ°ç¼“å†²åŒºå°¾éƒ¨äº†
+                MQTT_TxDataOutPtr = MQTT_TxDataBuf[0];            //æŒ‡é’ˆå½’ä½åˆ°ç¼“å†²åŒºå¼€å¤´
         }
-    }//´¦Àí·¢ËÍ»º³åÇøÊı¾İµÄelse if·ÖÖ§½áÎ²
+    }//å¤„ç†å‘é€ç¼“å†²åŒºæ•°æ®çš„else ifåˆ†æ”¯ç»“å°¾
 }
 
 
 /////////////////////////ESP8266//////////////////////////////////////////////////////
 
 /*-------------------------------------------------*/
-/*º¯ÊıÃû£º³õÊ¼»¯WiFiµÄ¸´Î»IO                       */
-/*²Î  Êı£ºÎŞ                                       */
-/*·µ»ØÖµ£ºÎŞ                                       */
+/*å‡½æ•°åï¼šåˆå§‹åŒ–WiFiçš„å¤ä½IO                       */
+/*å‚  æ•°ï¼šæ—                                        */
+/*è¿”å›å€¼ï¼šæ—                                        */
 /*-------------------------------------------------*/
 void WiFi_ResetIO_Init(void)
 {
-    GPIO_InitTypeDef GPIO_InitStructure;                      //¶¨ÒåÒ»¸öÉèÖÃIO¶Ë¿Ú²ÎÊıµÄ½á¹¹Ìå
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE);    //Ê¹ÄÜPA¶Ë¿ÚÊ±ÖÓ
+    GPIO_InitTypeDef GPIO_InitStructure;                      //å®šä¹‰ä¸€ä¸ªè®¾ç½®IOç«¯å£å‚æ•°çš„ç»“æ„ä½“
+    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE);    //ä½¿èƒ½PAç«¯å£æ—¶é’Ÿ
 	
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;                 //×¼±¸ÉèÖÃPA4
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //ËÙÂÊ50Mhz
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;   		  //ÍÆÃâÊä³ö·½Ê½
-    GPIO_Init(GPIOA, &GPIO_InitStructure);            		  //ÉèÖÃPA4
-    RESET_IO(1);                                              //¸´Î»IOÀ­¸ßµçÆ½
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;                 //å‡†å¤‡è®¾ç½®PA4
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;         //é€Ÿç‡50Mhz
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;   		  //æ¨å…è¾“å‡ºæ–¹å¼
+    GPIO_Init(GPIOA, &GPIO_InitStructure);            		  //è®¾ç½®PA4
+    RESET_IO(1);                                              //å¤ä½IOæ‹‰é«˜ç”µå¹³
 }
 
 /*-------------------------------------------------*/
-/*º¯ÊıÃû£ºWiFi×Ô¶¯¸´Î»                                 */
-/*²Î  Êı£ºtimeout£º³¬Ê±Ê±¼ä£¨100msµÄ±¶Êı£©         */
-/*·µ»ØÖµ£º0£ºÕıÈ·   ÆäËû£º´íÎó                     */
+/*å‡½æ•°åï¼šWiFiè‡ªåŠ¨å¤ä½                                 */
+/*å‚  æ•°ï¼štimeoutï¼šè¶…æ—¶æ—¶é—´ï¼ˆ100msçš„å€æ•°ï¼‰         */
+/*è¿”å›å€¼ï¼š0ï¼šæ­£ç¡®   å…¶ä»–ï¼šé”™è¯¯                     */
 /*-------------------------------------------------*/
 char WiFi_Reset(int timeout)
 {
-    RESET_IO(0);                                    //¸´Î»IOÀ­µÍµçÆ½
-    delay_ms(500);                                  //ÑÓÊ±500ms
-    RESET_IO(1);                                    //¸´Î»IOÀ­¸ßµçÆ½
-    while(timeout--)                                //µÈ´ı³¬Ê±Ê±¼äµ½0
+    RESET_IO(0);                                    //å¤ä½IOæ‹‰ä½ç”µå¹³
+    delay_ms(500);                                  //å»¶æ—¶500ms
+    RESET_IO(1);                                    //å¤ä½IOæ‹‰é«˜ç”µå¹³
+    while(timeout--)                                //ç­‰å¾…è¶…æ—¶æ—¶é—´åˆ°0
     {
-        delay_ms(100);                              //ÑÓÊ±100ms
-        if(strstr(WiFi_RX_BUF, "ready")||strstr(WiFi_RX_BUF, "invalid"))            //Èç¹û½ÓÊÕµ½  ready invalid ±íÊ¾¸´Î»³É¹¦
-            break;       						    //Ö÷¶¯Ìø³öwhileÑ­»·
+        delay_ms(100);                              //å»¶æ—¶100ms
+        if(strstr(WiFi_RX_BUF, "ready")||strstr(WiFi_RX_BUF, "invalid"))            //å¦‚æœæ¥æ”¶åˆ°  ready invalid è¡¨ç¤ºå¤ä½æˆåŠŸ
+            break;       						    //ä¸»åŠ¨è·³å‡ºwhileå¾ªç¯
     }
-    if(timeout <= 0)return 1;                       //Èç¹ûtimeout<=0£¬ËµÃ÷³¬Ê±Ê±¼äµ½ÁË£¬Ò²Ã»ÄÜÊÕµ½ready£¬·µ»Ø1
-    else return 0;		         				    //·´Ö®£¬±íÊ¾ÕıÈ·£¬ËµÃ÷ÊÕµ½ready£¬Í¨¹ıbreakÖ÷¶¯Ìø³öwhile
+    if(timeout <= 0)return 1;                       //å¦‚æœtimeout<=0ï¼Œè¯´æ˜è¶…æ—¶æ—¶é—´åˆ°äº†ï¼Œä¹Ÿæ²¡èƒ½æ”¶åˆ°readyï¼Œè¿”å›1
+    else return 0;		         				    //åä¹‹ï¼Œè¡¨ç¤ºæ­£ç¡®ï¼Œè¯´æ˜æ”¶åˆ°readyï¼Œé€šè¿‡breakä¸»åŠ¨è·³å‡ºwhile
 }
 
-//¸´Î»WIFIÄ£¿é
-//³É¹¦·µ»Ø0 Ê§°Ü·µ»Ø1
+//å¤ä½WIFIæ¨¡å—
+//æˆåŠŸè¿”å›0 å¤±è´¥è¿”å›1
 char WIFI_ConfighardwareRst(int time)
 {
 	memset(WiFi_RX_BUF,0,WiFi_RXBUFF_SIZE);
 	WiFi_RxCounter = 0;
-	while(time--)//´óÑ­»·¼ÆÊ±µÈ´ı//timeÒ»°ãÎª100 //100*100 = 10s 10ÃëÄÚÕÒ²»µ½¾ÍÍË³öwhile²»ÕÒÁË
+	while(time--)//å¤§å¾ªç¯è®¡æ—¶ç­‰å¾…//timeä¸€èˆ¬ä¸º100 //100*100 = 10s 10ç§’å†…æ‰¾ä¸åˆ°å°±é€€å‡ºwhileä¸æ‰¾äº†
 	{
-		delay_ms(100);//100*time = ¶àÉÙÃëÎŞÑÓÊ± Ìø³öwhile µÈ´ıÌ«¾Ã Ìø³öwhile
+		delay_ms(100);//100*time = å¤šå°‘ç§’æ— å»¶æ—¶ è·³å‡ºwhile ç­‰å¾…å¤ªä¹… è·³å‡ºwhile
 		if(strstr(WiFi_RX_BUF,"ready"))
-			break;//ÕÒµ½ Ìø³öwhile
+			break;//æ‰¾åˆ° è·³å‡ºwhile
 		#if mqtt_debug
 			IotDebug_prinf ("%d ",time); 
 		#endif
@@ -647,9 +647,9 @@ char WIFI_ConfighardwareRst(int time)
 }
 
 
-//·¢ËÍATÖ¸Áîº¯Êı
-//cmd£º·¢ËÍµÄÃüÁî  response£º½ÓÊÕµ½µÄÊı¾İ
-//³É¹¦·µ»Ø0 Ê§°Ü·µ»Ø1
+//å‘é€ATæŒ‡ä»¤å‡½æ•°
+//cmdï¼šå‘é€çš„å‘½ä»¤  responseï¼šæ¥æ”¶åˆ°çš„æ•°æ®
+//æˆåŠŸè¿”å›0 å¤±è´¥è¿”å›1
 char WIFI_Config(int time,char *cmd,char *response)
 {
 	memset(WiFi_RX_BUF,0,WiFi_RXBUFF_SIZE);
@@ -669,7 +669,7 @@ char WIFI_Config(int time,char *cmd,char *response)
     else
        return 1; 
 }
-//Á¬½ÓWIFIÍøÂçº¯Êı
+//è¿æ¥WIFIç½‘ç»œå‡½æ•°
 char WIFI_Router(int time)
 {
 	memset(WiFi_RX_BUF,0,WiFi_RXBUFF_SIZE);
@@ -677,7 +677,7 @@ char WIFI_Router(int time)
 	u2_printf("AT+CWJAP=\"%s\",\"%s\"\r\n",WIFIID,PASSWORD); 
 	while(time--)
 	{
-		delay_ms(1000);//Á¬½ÓWIFIÊ±¼ä³¤µã
+		delay_ms(1000);//è¿æ¥WIFIæ—¶é—´é•¿ç‚¹
 		if(strstr(WiFi_RX_BUF,"OK"))
 			break;
 		#if mqtt_debug
@@ -690,7 +690,7 @@ char WIFI_Router(int time)
        return 1;
 }
 
-char WIFI_ConnectTCP(int time)//µÚÆß²½£º½¨Á¢TCPÁ¬½Ó£¨ºÍÊÖ»úµÄ·şÎñ¶Ë½øĞĞÁ¬½Ó£©
+char WIFI_ConnectTCP(int time)//ç¬¬ä¸ƒæ­¥ï¼šå»ºç«‹TCPè¿æ¥ï¼ˆå’Œæ‰‹æœºçš„æœåŠ¡ç«¯è¿›è¡Œè¿æ¥ï¼‰
 {
 	memset(WiFi_RX_BUF,0,WiFi_RXBUFF_SIZE);
 	WiFi_RxCounter = 0;
@@ -698,7 +698,7 @@ char WIFI_ConnectTCP(int time)//µÚÆß²½£º½¨Á¢TCPÁ¬½Ó£¨ºÍÊÖ»úµÄ·şÎñ¶Ë½øĞĞÁ¬½Ó£©
 	u2_printf("AT+CIPSTART=\"TCP\",\"%s\",%d\r\n",ServerIP,ServerPort); 
 	while(time--)
 	{
-		delay_ms(1000);//Á¬½ÓWIFIÊ±¼ä³¤µã
+		delay_ms(1000);//è¿æ¥WIFIæ—¶é—´é•¿ç‚¹
 		if(strstr(WiFi_RX_BUF,"OK"))
 			break;
 		#if mqtt_debug
@@ -714,179 +714,179 @@ char WIFI_ConnectTCP(int time)//µÚÆß²½£º½¨Á¢TCPÁ¬½Ó£¨ºÍÊÖ»úµÄ·şÎñ¶Ë½øĞĞÁ¬½Ó£©
 char WiFi_Connect_IoTServer(void)
 {
 
-/*0¡¢°´¼ü¸´Î»*/
+/*0ã€æŒ‰é”®å¤ä½*/
 	#if mqtt_debug
-		IotDebug_prinf ("0¡¢×¼±¸°´¼ü¸´Î»!\r\n");
+		IotDebug_prinf ("0ã€å‡†å¤‡æŒ‰é”®å¤ä½!\r\n");
 	#endif
 	if(WiFi_Reset(100))
 	{
-		IotDebug_prinf ("°´¼ü¸´Î»Ê§°Ü!\r\n");
+		IotDebug_prinf ("æŒ‰é”®å¤ä½å¤±è´¥!\r\n");
 		return 1;
 	}
 	else
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("°´¼ü¸´Î»³É¹¦!\r\n");
+			IotDebug_prinf ("æŒ‰é”®å¤ä½æˆåŠŸ!\r\n");
 		#endif
 	}
 	#if mqtt_debug
 		IotDebug_prinf ("\r\n");
 	#endif
 	
-/*1¡¢ÅäÖÃWIFIÄ£Ê½*///stationÄ£Ê½
+/*1ã€é…ç½®WIFIæ¨¡å¼*///stationæ¨¡å¼
 	#if mqtt_debug
-		IotDebug_prinf ("1¡¢×¼±¸ÅäÖÃWIFIÄ£Ê½!\r\n");
+		IotDebug_prinf ("1ã€å‡†å¤‡é…ç½®WIFIæ¨¡å¼!\r\n");
 	#endif
 	if(WIFI_Config(50,"AT+CWMODE=1\r\n","OK"))
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("ÅäÖÃWIFIÄ£Ê½Ê§°Ü!\r\n");
+			IotDebug_prinf ("é…ç½®WIFIæ¨¡å¼å¤±è´¥!\r\n");
 		#endif
 		return 2;
 	}
 	else
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("ÅäÖÃWIFIÄ£Ê½³É¹¦!\r\n");
+			IotDebug_prinf ("é…ç½®WIFIæ¨¡å¼æˆåŠŸ!\r\n");
 		#endif		
 	}
 	#if mqtt_debug
 		IotDebug_prinf ("\r\n");	
 	#endif
-/*2¡¢ÖØÆô(ÃüÁî·½Ê½)*/	
+/*2ã€é‡å¯(å‘½ä»¤æ–¹å¼)*/	
 	#if mqtt_debug
-		IotDebug_prinf ("2¡¢×¼±¸¸´Î»!\r\n");
+		IotDebug_prinf ("2ã€å‡†å¤‡å¤ä½!\r\n");
 	#endif	
 	if(WIFI_Config(50,"AT+RST\r\n","ready"))
 	{
 		#if mqtt_debug		
-			IotDebug_prinf ("¸´Î»Ê§°Ü!\r\n");
+			IotDebug_prinf ("å¤ä½å¤±è´¥!\r\n");
 		#endif	
 		return 3;
 	}
 	else
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("¸´Î»³É¹¦!\r\n");
+			IotDebug_prinf ("å¤ä½æˆåŠŸ!\r\n");
 		#endif
 	}
 		#if mqtt_debug
 			IotDebug_prinf ("\r\n");
 		#endif
-/*3¡¢È¡Ïû×Ô¶¯Á¬½Ó*/		
+/*3ã€å–æ¶ˆè‡ªåŠ¨è¿æ¥*/		
 	#if mqtt_debug
-		IotDebug_prinf ("3¡¢×¼±¸È¡Ïû×Ô¶¯Á¬½Ó\r\n");
+		IotDebug_prinf ("3ã€å‡†å¤‡å–æ¶ˆè‡ªåŠ¨è¿æ¥\r\n");
 	#endif
 	if(WIFI_Config(50,"AT+CWAUTOCONN=0\r\n","OK"))
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("È¡Ïû×Ô¶¯Á¬½ÓÊ§°Ü!\r\n");
+			IotDebug_prinf ("å–æ¶ˆè‡ªåŠ¨è¿æ¥å¤±è´¥!\r\n");
 		#endif
 		return 4;
 	}
 	else
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("È¡Ïû×Ô¶¯Á¬½Ó³É¹¦!\r\n");
+			IotDebug_prinf ("å–æ¶ˆè‡ªåŠ¨è¿æ¥æˆåŠŸ!\r\n");
 		#endif
 	}	
 	#if mqtt_debug
 		IotDebug_prinf ("\r\n");
 	#endif
-/*4¡¢Á¬½ÓÂ·ÓÉÆ÷*/	
+/*4ã€è¿æ¥è·¯ç”±å™¨*/	
 	#if mqtt_debug
-		IotDebug_prinf ("4¡¢×¼±¸Á¬½ÓÂ·ÓÉÆ÷\r\n");
+		IotDebug_prinf ("4ã€å‡†å¤‡è¿æ¥è·¯ç”±å™¨\r\n");
 	#endif
 	if(WIFI_Router(50))
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("Á¬½ÓÂ·ÓÉÆ÷Ê§°Ü!\r\n");
+			IotDebug_prinf ("è¿æ¥è·¯ç”±å™¨å¤±è´¥!\r\n");
 		#endif
 		return 5;
 	}
 	else
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("Á¬½ÓÂ·ÓÉÆ÷³É¹¦!\r\n");
+			IotDebug_prinf ("è¿æ¥è·¯ç”±å™¨æˆåŠŸ!\r\n");
 		#endif
 	}
 	#if mqtt_debug
 		IotDebug_prinf ("\r\n");
 	#endif
-/*5¡¢ÅäÖÃµ¥Â·Á¬½ÓÄ£Ê½*/	
+/*5ã€é…ç½®å•è·¯è¿æ¥æ¨¡å¼*/	
 	#if mqtt_debug	
-		IotDebug_prinf ("5¡¢×¼±¸ÅäÖÃµ¥Â·Á¬½ÓÄ£Ê½!\r\n");
+		IotDebug_prinf ("5ã€å‡†å¤‡é…ç½®å•è·¯è¿æ¥æ¨¡å¼!\r\n");
 	#endif
 	if(WIFI_Config(50,"AT+CIPMUX=0\r\n","OK"))
 	{
 		#if mqtt_debug	
-			IotDebug_prinf ("ÅäÖÃµ¥Â·Á¬½ÓÄ£Ê½Ê§°Ü!\r\n");
+			IotDebug_prinf ("é…ç½®å•è·¯è¿æ¥æ¨¡å¼å¤±è´¥!\r\n");
 		#endif
 		return 6;
 	}
 	else
 	{
 		#if mqtt_debug
-			IotDebug_prinf ("ÅäÖÃµ¥Â·Á¬½ÓÄ£Ê½³É¹¦!\r\n");
+			IotDebug_prinf ("é…ç½®å•è·¯è¿æ¥æ¨¡å¼æˆåŠŸ!\r\n");
 		#endif
 	}
 	#if mqtt_debug	
 	IotDebug_prinf ("\r\n");
 	#endif
-/*6¡¢¿ªÆôÍ¸´«Ä£Ê½*/
+/*6ã€å¼€å¯é€ä¼ æ¨¡å¼*/
 	#if	mqtt_debug
-		IotDebug_prinf ("6¡¢×¼±¸¿ªÆôÍ¸´«Ä£Ê½\r\n");
+		IotDebug_prinf ("6ã€å‡†å¤‡å¼€å¯é€ä¼ æ¨¡å¼\r\n");
 	#endif
 	if(WIFI_Config(50,"AT+CIPMODE=1\r\n","OK"))
 	{
 		#if	mqtt_debug
-			IotDebug_prinf ("¿ªÆôÍ¸´«Ä£Ê½Ê§°Ü!\r\n");
+			IotDebug_prinf ("å¼€å¯é€ä¼ æ¨¡å¼å¤±è´¥!\r\n");
 		#endif
 		return 7;
 	}
 	else
 	{
 		#if	mqtt_debug
-			IotDebug_prinf ("¿ªÆôÍ¸´«Ä£Ê½³É¹¦!\r\n");
+			IotDebug_prinf ("å¼€å¯é€ä¼ æ¨¡å¼æˆåŠŸ!\r\n");
 		#endif
 	}
 	#if	mqtt_debug
 		IotDebug_prinf ("\r\n");
 	#endif
-/*7¡¢½¨Á¢TCPÁ¬½Ó*/	//ºÍÊÖ»úµÄ·şÎñ¶Ë½øĞĞÁ¬½Ó£©
-	//ºÍPC/ÊÖ»úµÄTCP·şÎñÆ÷Á¬½Ó
-	//Ò²¿ÉÒÔºÍ°¢ÀïÔÆÁ¬½Ó°¡
+/*7ã€å»ºç«‹TCPè¿æ¥*/	//å’Œæ‰‹æœºçš„æœåŠ¡ç«¯è¿›è¡Œè¿æ¥ï¼‰
+	//å’ŒPC/æ‰‹æœºçš„TCPæœåŠ¡å™¨è¿æ¥
+	//ä¹Ÿå¯ä»¥å’Œé˜¿é‡Œäº‘è¿æ¥å•Š
 	if(WIFI_ConnectTCP(50))
 	{
 		#if	mqtt_debug
-			IotDebug_prinf ("½¨Á¢TCPÁ¬½ÓÊ§°Ü!\r\n");
+			IotDebug_prinf ("å»ºç«‹TCPè¿æ¥å¤±è´¥!\r\n");
 		#endif
 		return 8;
 	}
 	else
 	{
 		#if	mqtt_debug
-			IotDebug_prinf ("½¨Á¢TCPÁ¬½Ó³É¹¦!\r\n");
+			IotDebug_prinf ("å»ºç«‹TCPè¿æ¥æˆåŠŸ!\r\n");
 		#endif
 	}
 	#if	mqtt_debug
 		IotDebug_prinf ("\r\n");
 	#endif
-/*8¡¢½øÈëÍ¸´«Ä£Ê½*/	//¿ÉÒÔ·¢ËÍÊı¾İ
+/*8ã€è¿›å…¥é€ä¼ æ¨¡å¼*/	//å¯ä»¥å‘é€æ•°æ®
 	#if	mqtt_debug
-		IotDebug_prinf ("8¡¢×¼±¸½øÈëÍ¸´«Ä£Ê½\r\n");
+		IotDebug_prinf ("8ã€å‡†å¤‡è¿›å…¥é€ä¼ æ¨¡å¼\r\n");
 	#endif
 	if(WIFI_Config(50,"AT+CIPSEND\r\n","\r\nOK\r\n\r\n>"))
 	{
 		#if	mqtt_debug
-			IotDebug_prinf ("½øÈëÍ¸´«Ä£Ê½Ê§°Ü!\r\n");
+			IotDebug_prinf ("è¿›å…¥é€ä¼ æ¨¡å¼å¤±è´¥!\r\n");
 		#endif
 		return 9;
 	}
 	else
 	{
 		#if	mqtt_debug
-			IotDebug_prinf ("½øÈëÍ¸´«Ä£Ê½³É¹¦!\r\n");
+			IotDebug_prinf ("è¿›å…¥é€ä¼ æ¨¡å¼æˆåŠŸ!\r\n");
 		#endif
 	}
 	return 0;
@@ -894,16 +894,16 @@ char WiFi_Connect_IoTServer(void)
 
 
 /******************************************************************************
-Á¬½Óesp6266²½Öè
-	WIFI_ConfigRst(100);//¸´Î»
-	WIFI_Config(50,"AT+CWMODE=1\r\n","OK");//µÚÒ»²½£ºÉèÖÃWIFIÄ£¿éÎªSationÄ£Ê½
-	WIFI_Config(50,"AT+RST\r\n","ready");//µÚ¶ş²¿£ºÖØÆôWIFIÄ£¿é
-	WIFI_Config(50,"AT+CWAUTOCONN=0\r\n","OK");//µÚÈı²½£º²»×Ô¶¯Á¬½ÓÍøÂç
-	WIFI_Router(50);//µÚËÄ²½£ºÁ¬½ÓÍøÂç
-	WIFI_Config(50,"AT+CIPMUX=0\r\n","OK");//µÚÎå²½£ºÉèÖÃµ¥Á¬½ÓÄ£Ê½ Ö»ÄÜÁ¬½ÓÒ»¸öÉè±¸
-	WIFI_Config(50,"AT+CIPMODE=1\r\n","OK");//µÚÁù²½£ºÉèÖÃÎªÍ¸´«Ä£Ê½
-	WIFI_ConnectTCP(50);//µÚÆß²½£º½¨Á¢TCPÁ¬½Ó£¨ºÍÊÖ»úµÄ·şÎñ¶Ë½øĞĞÁ¬½Ó£©
-	WIFI_Config(50,"AT+CIPSEND\r\n","\r\nOK\r\n\r\n>");//µÚ°Ë²½£ºÔÚÍ¸´«Ä£Ê½£¬¿ªÊ¼·¢ËÍÊı¾İ
+è¿æ¥esp6266æ­¥éª¤
+	WIFI_ConfigRst(100);//å¤ä½
+	WIFI_Config(50,"AT+CWMODE=1\r\n","OK");//ç¬¬ä¸€æ­¥ï¼šè®¾ç½®WIFIæ¨¡å—ä¸ºSationæ¨¡å¼
+	WIFI_Config(50,"AT+RST\r\n","ready");//ç¬¬äºŒéƒ¨ï¼šé‡å¯WIFIæ¨¡å—
+	WIFI_Config(50,"AT+CWAUTOCONN=0\r\n","OK");//ç¬¬ä¸‰æ­¥ï¼šä¸è‡ªåŠ¨è¿æ¥ç½‘ç»œ
+	WIFI_Router(50);//ç¬¬å››æ­¥ï¼šè¿æ¥ç½‘ç»œ
+	WIFI_Config(50,"AT+CIPMUX=0\r\n","OK");//ç¬¬äº”æ­¥ï¼šè®¾ç½®å•è¿æ¥æ¨¡å¼ åªèƒ½è¿æ¥ä¸€ä¸ªè®¾å¤‡
+	WIFI_Config(50,"AT+CIPMODE=1\r\n","OK");//ç¬¬å…­æ­¥ï¼šè®¾ç½®ä¸ºé€ä¼ æ¨¡å¼
+	WIFI_ConnectTCP(50);//ç¬¬ä¸ƒæ­¥ï¼šå»ºç«‹TCPè¿æ¥ï¼ˆå’Œæ‰‹æœºçš„æœåŠ¡ç«¯è¿›è¡Œè¿æ¥ï¼‰
+	WIFI_Config(50,"AT+CIPSEND\r\n","\r\nOK\r\n\r\n>");//ç¬¬å…«æ­¥ï¼šåœ¨é€ä¼ æ¨¡å¼ï¼Œå¼€å§‹å‘é€æ•°æ®
 ***********************************************************************************/
 
 

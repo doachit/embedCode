@@ -5,80 +5,77 @@
 	* @CSDN  				: https://blog.csdn.net/m0_58326153/
 	* @Bili  				: https://b23.tv/llaF6l2
 */
-#include "iot_timer3_Ping.h"     //°üº¬ĞèÒªµÄÍ·ÎÄ¼ş
-#include "iot_wifi_mqtt.h"
-#include "iot_usart2.h"
-#include "sys.h"
-int SystemTimer =0;                 //ÓÃ»§ÉÏ´«Êı¾İµÄÊ±¼ä¼ä¸ô£¨È«¾Ö±äÁ¿£©
-unsigned int Length_of_time = 3000;	//PING±¨ÎÄµÄÊ±¼ä¼ä¸ô±äÁ¿£¨È«¾Ö±äÁ¿£©
+#include "iot_timer3_Ping.h"     //åŒ…å«éœ€è¦çš„å¤´æ–‡ä»¶
+int SystemTimer =0;                 //ç”¨æˆ·ä¸Šä¼ æ•°æ®çš„æ—¶é—´é—´éš”ï¼ˆå…¨å±€å˜é‡ï¼‰
+unsigned int Length_of_time = 3000;	//PINGæŠ¥æ–‡çš„æ—¶é—´é—´éš”å˜é‡ï¼ˆå…¨å±€å˜é‡ï¼‰
 /*
 	* @name   TIM3_ENABLE_10MS
-	* @brief  ³õÊ¼»¯¶¨Ê±Æ÷3£¬¶¨Ê±10ms
+	* @brief  åˆå§‹åŒ–å®šæ—¶å™¨3ï¼Œå®šæ—¶10ms
 	* @param  [None]
 	* @return [None]
 */
 void TIM3_ENABLE_10MS(void)
 {
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;            //¶¨ÒåÒ»¸öÉèÖÃ¶¨Ê±Æ÷µÄ±äÁ¿
-	NVIC_InitTypeDef NVIC_InitStructure;                          //¶¨ÒåÒ»¸öÉèÖÃÖĞ¶ÏµÄ±äÁ¿
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;            //å®šä¹‰ä¸€ä¸ªè®¾ç½®å®šæ—¶å™¨çš„å˜é‡
+	NVIC_InitTypeDef NVIC_InitStructure;                          //å®šä¹‰ä¸€ä¸ªè®¾ç½®ä¸­æ–­çš„å˜é‡
 	
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);               //ÉèÖÃÖĞ¶ÏÏòÁ¿·Ö×é£ºµÚ2×é ÇÀÏÈÓÅÏÈ¼¶£º0 1 2 3 ×ÓÓÅÏÈ¼¶£º0 1 2 3		
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);           //Ê¹ÄÜTIM3Ê±ÖÓ	
-	TIM_DeInit(TIM3);                                             //¶¨Ê±Æ÷3¼Ä´æÆ÷»Ö¸´Ä¬ÈÏÖµ	
-	TIM_TimeBaseInitStructure.TIM_Period = 100-1; 	          //ÉèÖÃ×Ô¶¯ÖØ×°ÔØÖµ        60000-1
-	TIM_TimeBaseInitStructure.TIM_Prescaler=7200-1;              //ÉèÖÃ¶¨Ê±Æ÷Ô¤·ÖÆµÊı    36000-1
-	TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; //ÏòÉÏ¼ÆÊıÄ£Ê½
-	TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;     //1·ÖÆµ
-	TIM_TimeBaseInit(TIM3,&TIM_TimeBaseInitStructure);            //ÉèÖÃTIM3
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);               //è®¾ç½®ä¸­æ–­å‘é‡åˆ†ç»„ï¼šç¬¬2ç»„ æŠ¢å…ˆä¼˜å…ˆçº§ï¼š0 1 2 3 å­ä¼˜å…ˆçº§ï¼š0 1 2 3		
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);           //ä½¿èƒ½TIM3æ—¶é’Ÿ	
+	TIM_DeInit(TIM3);                                             //å®šæ—¶å™¨3å¯„å­˜å™¨æ¢å¤é»˜è®¤å€¼	
+	TIM_TimeBaseInitStructure.TIM_Period = 100-1; 	          //è®¾ç½®è‡ªåŠ¨é‡è£…è½½å€¼        60000-1
+	TIM_TimeBaseInitStructure.TIM_Prescaler=7200-1;              //è®¾ç½®å®šæ—¶å™¨é¢„åˆ†é¢‘æ•°    36000-1
+	TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; //å‘ä¸Šè®¡æ•°æ¨¡å¼
+	TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;     //1åˆ†é¢‘
+	TIM_TimeBaseInit(TIM3,&TIM_TimeBaseInitStructure);            //è®¾ç½®TIM3
 	
-	TIM_ClearITPendingBit(TIM3,TIM_IT_Update);                    //Çå³ıÒç³öÖĞ¶Ï±êÖ¾Î»
-	TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE);                      //Ê¹ÄÜTIM3Òç³öÖĞ¶Ï    
-	TIM_Cmd(TIM3,ENABLE);                                         //¿ªTIM3                          
+	TIM_ClearITPendingBit(TIM3,TIM_IT_Update);                    //æ¸…é™¤æº¢å‡ºä¸­æ–­æ ‡å¿—ä½
+	TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE);                      //ä½¿èƒ½TIM3æº¢å‡ºä¸­æ–­    
+	TIM_Cmd(TIM3,ENABLE);                                         //å¼€TIM3                          
 	
-	NVIC_InitStructure.NVIC_IRQChannel=TIM3_IRQn;                 //ÉèÖÃTIM3ÖĞ¶Ï
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;       //ÇÀÕ¼ÓÅÏÈ¼¶2
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority=1;              //×ÓÓÅÏÈ¼¶0
-	NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;                 //ÖĞ¶ÏÍ¨µÀÊ¹ÄÜ
-	NVIC_Init(&NVIC_InitStructure);                               //ÉèÖÃÖĞ¶Ï
+	NVIC_InitStructure.NVIC_IRQChannel=TIM3_IRQn;                 //è®¾ç½®TIM3ä¸­æ–­
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;       //æŠ¢å ä¼˜å…ˆçº§2
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority=1;              //å­ä¼˜å…ˆçº§0
+	NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;                 //ä¸­æ–­é€šé“ä½¿èƒ½
+	NVIC_Init(&NVIC_InitStructure);                               //è®¾ç½®ä¸­æ–­
 }
 
 /*
 	* @name   TIM3_IRQHandler
-	* @brief  ³õÊ¼»¯¶¨Ê±Æ÷3£¬¶¨Ê±10ms
+	* @brief  åˆå§‹åŒ–å®šæ—¶å™¨3ï¼Œå®šæ—¶10ms
 	* @param  [None]
 	* @return [None]
 */
 void TIM3_IRQHandler(void)
 {
 	if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
-	{   //Èç¹ûTIM_IT_UpdateÖÃÎ»£¬±íÊ¾TIM3Òç³öÖĞ¶Ï£¬½øÈëif	
+	{   //å¦‚æœTIM_IT_Updateç½®ä½ï¼Œè¡¨ç¤ºTIM3æº¢å‡ºä¸­æ–­ï¼Œè¿›å…¥if	
 		static unsigned int time_temp= 0;
 		time_temp++;
-		if(time_temp>Length_of_time) //10*3000 =30S½øÈëÒ»´Î30SPingÒ»´Î
+		if(time_temp>Length_of_time) //10*3000 =30Sè¿›å…¥ä¸€æ¬¡30SPingä¸€æ¬¡
 		{
 			time_temp = 0;
 			switch(Ping_flag)
-			{                               //ÅĞ¶ÏPing_flagµÄ×´Ì¬
-				case 0:										 //Èç¹ûPing_flagµÈÓÚ0£¬±íÊ¾Õı³£×´Ì¬£¬·¢ËÍPing±¨ÎÄ  
-						Mqtt_PingMessage_To_Buff(); 					 //Ìí¼ÓPing±¨ÎÄµ½·¢ËÍ»º³åÇø  
+			{                               //åˆ¤æ–­Ping_flagçš„çŠ¶æ€
+				case 0:										 //å¦‚æœPing_flagç­‰äº0ï¼Œè¡¨ç¤ºæ­£å¸¸çŠ¶æ€ï¼Œå‘é€PingæŠ¥æ–‡  
+						Mqtt_PingMessage_To_Buff(); 					 //æ·»åŠ PingæŠ¥æ–‡åˆ°å‘é€ç¼“å†²åŒº  
 						break;
-				case 1:										 //Èç¹ûPing_flagµÈÓÚ1£¬ËµÃ÷ÉÏÒ»´Î·¢ËÍµ½µÄping±¨ÎÄ£¬Ã»ÓĞÊÕµ½·şÎñÆ÷»Ø¸´£¬ËùÒÔ1Ã»ÓĞ±»Çå³ıÎª0£¬¿ÉÄÜÊÇÁ¬½ÓÒì³££¬ÎÒÃÇÒªÆô¶¯¿ìËÙpingÄ£Ê½
+				case 1:										 //å¦‚æœPing_flagç­‰äº1ï¼Œè¯´æ˜ä¸Šä¸€æ¬¡å‘é€åˆ°çš„pingæŠ¥æ–‡ï¼Œæ²¡æœ‰æ”¶åˆ°æœåŠ¡å™¨å›å¤ï¼Œæ‰€ä»¥1æ²¡æœ‰è¢«æ¸…é™¤ä¸º0ï¼Œå¯èƒ½æ˜¯è¿æ¥å¼‚å¸¸ï¼Œæˆ‘ä»¬è¦å¯åŠ¨å¿«é€Ÿpingæ¨¡å¼
 				
-						Mqtt_PingMessage_To_Buff();  					 //Ìí¼ÓPing±¨ÎÄµ½·¢ËÍ»º³åÇø  
+						Mqtt_PingMessage_To_Buff();  					 //æ·»åŠ PingæŠ¥æ–‡åˆ°å‘é€ç¼“å†²åŒº  
 						break;
-				case 2:			Mqtt_PingMessage_To_Buff();								break;	 //Èç¹ûPing_flagµÈÓÚ2£¬ËµÃ÷»¹Ã»ÓĞÊÕµ½·şÎñÆ÷»Ø¸´
-				case 3:			Mqtt_PingMessage_To_Buff();		            	break;             //Èç¹ûPing_flagµÈÓÚ3£¬ËµÃ÷»¹Ã»ÓĞÊÕµ½·şÎñÆ÷»Ø¸´
-				case 4:				Length_of_time = 200;					 //ÎÒÃÇ½«¶¨Ê±Æ÷6ÉèÖÃÎª2s¶¨Ê±,¿ìËÙ·¢ËÍPing±¨ÎÄ        //Èç¹ûPing_flagµÈÓÚ4£¬ËµÃ÷»¹Ã»ÓĞÊÕµ½·şÎñÆ÷»Ø¸´	
-						Mqtt_PingMessage_To_Buff();  					 //Ìí¼ÓPing±¨ÎÄµ½·¢ËÍ»º³åÇø 
+				case 2:			Mqtt_PingMessage_To_Buff();								break;	 //å¦‚æœPing_flagç­‰äº2ï¼Œè¯´æ˜è¿˜æ²¡æœ‰æ”¶åˆ°æœåŠ¡å™¨å›å¤
+				case 3:			Mqtt_PingMessage_To_Buff();		            	break;             //å¦‚æœPing_flagç­‰äº3ï¼Œè¯´æ˜è¿˜æ²¡æœ‰æ”¶åˆ°æœåŠ¡å™¨å›å¤
+				case 4:				Length_of_time = 200;					 //æˆ‘ä»¬å°†å®šæ—¶å™¨6è®¾ç½®ä¸º2så®šæ—¶,å¿«é€Ÿå‘é€PingæŠ¥æ–‡        //å¦‚æœPing_flagç­‰äº4ï¼Œè¯´æ˜è¿˜æ²¡æœ‰æ”¶åˆ°æœåŠ¡å™¨å›å¤	
+						Mqtt_PingMessage_To_Buff();  					 //æ·»åŠ PingæŠ¥æ–‡åˆ°å‘é€ç¼“å†²åŒº 
 						break;
-				case 5:										 //Èç¹ûPing_flagµÈÓÚ5£¬ËµÃ÷ÎÒÃÇ·¢ËÍÁË¶à´Îping£¬¾ùÎŞ»Ø¸´£¬Ó¦¸ÃÊÇÁ¬½ÓÓĞÎÊÌâ£¬ÎÒÃÇÖØÆôÁ¬½Ó
-						ConnectALi_flag = 0;                    //Á¬½Ó×´Ì¬ÖÃ0£¬±íÊ¾¶Ï¿ª£¬Ã»Á¬ÉÏ·şÎñÆ÷
-						TIM_Cmd(TIM3,DISABLE);               //¹ØTIM3 				
+				case 5:										 //å¦‚æœPing_flagç­‰äº5ï¼Œè¯´æ˜æˆ‘ä»¬å‘é€äº†å¤šæ¬¡pingï¼Œå‡æ— å›å¤ï¼Œåº”è¯¥æ˜¯è¿æ¥æœ‰é—®é¢˜ï¼Œæˆ‘ä»¬é‡å¯è¿æ¥
+						ConnectALi_flag = 0;                    //è¿æ¥çŠ¶æ€ç½®0ï¼Œè¡¨ç¤ºæ–­å¼€ï¼Œæ²¡è¿ä¸ŠæœåŠ¡å™¨
+						TIM_Cmd(TIM3,DISABLE);               //å…³TIM3 				
 						break;			
 			}
-			Ping_flag++;           		             		 //Ping_flag×ÔÔö1£¬±íÊ¾ÓÖ·¢ËÍÁËÒ»´Îping£¬ÆÚ´ı·şÎñÆ÷µÄ»Ø¸´
+			Ping_flag++;           		             		 //Ping_flagè‡ªå¢1ï¼Œè¡¨ç¤ºåˆå‘é€äº†ä¸€æ¬¡pingï¼ŒæœŸå¾…æœåŠ¡å™¨çš„å›å¤
 		}	
-		SystemTimer++; //·¢ËÍÊı¾İµÄ¶¨Ê±Æ÷
-		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);      //Çå³ıTIM3Òç³öÖĞ¶Ï±êÖ¾ 	
+		SystemTimer++; //å‘é€æ•°æ®çš„å®šæ—¶å™¨
+		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);      //æ¸…é™¤TIM3æº¢å‡ºä¸­æ–­æ ‡å¿— 	
 	}
 }
