@@ -49,7 +49,7 @@ void IOT_Connect(void)
 
 void ITO_GetCmdData_Deal(void)
 {
-		star_sp =strstr((char *)MQTT_CMDOutPtr + 2, (char *)"params");
+	star_sp =strstr((char *)MQTT_CMDOutPtr + 2, (char *)"params");
 		//  从云端获取数据 并更改数据
     if(star_sp == strstr((char *)MQTT_CMDOutPtr + 2, (char *)"params")) //app下发数据---定位得到标识符前面的字符 ，用于求出标识符有多大
     {		
