@@ -1,83 +1,172 @@
 #include "bsp_usart.h"
 
- /**
-  * @brief  配置嵌套向量中断控制器NVIC
-  * @param  无
-  * @retval 无
-  */
-static void NVIC_Configuration(void)
-{
-  NVIC_InitTypeDef NVIC_InitStructure;
-  
-  /* 嵌套向量中断控制器组选择 */
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-  
-  /* 配置USART为中断源 */
-  NVIC_InitStructure.NVIC_IRQChannel = DEBUG_USART_IRQ;
-  /* 抢断优先级*/
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  /* 子优先级 */
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  /* 使能中断 */
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  /* 初始化配置NVIC */
-  NVIC_Init(&NVIC_InitStructure);
+// 串口对象实例
+USART_Object USART1_Obj = {0};
+USART_Object USART2_Obj = {0};
+USART_Object USART3_Obj = {0};
+
+static const USART_HWConfig USART_Configs[] = {
+    {   // USART1: 最高优先级
+        USART1, GPIOA, GPIO_Pin_9, GPIO_Pin_10,
+        RCC_APB2Periph_GPIOA, RCC_APB2Periph_USART1,
+        USART1_IRQn, 0  // 抢占优先级0（最高）
+    },
+    {   // USART2: 中等优先级
+        USART2, GPIOA, GPIO_Pin_2, GPIO_Pin_3,
+        RCC_APB2Periph_GPIOA, RCC_APB1Periph_USART2,
+        USART2_IRQn, 1  // 抢占优先级1
+    },
+    {   // USART3: 最低优先级
+        USART3, GPIOB, GPIO_Pin_10, GPIO_Pin_11,
+        RCC_APB2Periph_GPIOB, RCC_APB1Periph_USART3,
+        USART3_IRQn, 2  // 抢占优先级2
+    }
+};
+
+static USART_Object* GetUSARTObj(USART_TypeDef* USARTx) {
+    int i;
+    for(i=0; i<sizeof(USART_Configs)/sizeof(USART_Configs[0]); i++) {
+        if(USART_Configs[i].USARTx == USARTx) {
+            switch((uint32_t)USARTx) {
+                case USART1_BASE: return &USART1_Obj;
+                case USART2_BASE: return &USART2_Obj;
+                case USART3_BASE: return &USART3_Obj;
+            }
+        }
+    }
+    return NULL;
 }
 
- /**
-  * @brief  USART GPIO 配置,工作参数配置
-  * @param  无
-  * @retval 无
-  */
-void USART_Config(void)
+static void NVIC_Configuration(const USART_HWConfig* config) {
+	NVIC_InitTypeDef NVIC_InitStructure;
+  
+	/* 嵌套向量中断控制器组选择 */
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+
+	/* 配置USART为中断源 */
+	NVIC_InitStructure.NVIC_IRQChannel = config->IRQn;
+	/* 抢断优先级*/
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = config->PreemptPriority;
+	/* 子优先级 */
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	/* 使能中断 */
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+}
+
+static void GPIO_Configuration(const USART_HWConfig* config) {
+    GPIO_InitTypeDef GPIO_InitStruct;
+    
+    RCC_APB2PeriphClockCmd(config->GPIO_CLK, ENABLE);
+
+    // TX引脚配置
+    GPIO_InitStruct.GPIO_Pin = config->TxPin;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(config->GPIOx, &GPIO_InitStruct);
+
+    // RX引脚配置
+    GPIO_InitStruct.GPIO_Pin = config->RxPin;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+    GPIO_Init(config->GPIOx, &GPIO_InitStruct);
+}
+
+void USART_Module_Init(USART_TypeDef* USARTx, uint32_t baudrate, FunctionalState interrupt)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	USART_InitTypeDef USART_InitStructure;
+    const USART_HWConfig* hw_config = NULL;
+    USART_Object* obj = NULL;
+        // 串口参数配置
+    USART_InitTypeDef USART_InitStruct;
+    int i;
+    // 查找硬件配置
+    for(i=0; i<sizeof(USART_Configs)/sizeof(USART_Configs[0]); i++) {
+        if(USART_Configs[i].USARTx == USARTx) {
+            hw_config = &USART_Configs[i];
+            obj = GetUSARTObj(USARTx);
+            break;
+        }
+    }
+    
+    if(!hw_config || !obj) return;
 
-	// 打开串口GPIO的时钟
-	DEBUG_USART_GPIO_APBxClkCmd(DEBUG_USART_GPIO_CLK, ENABLE);
-	
-	// 打开串口外设的时钟
-	DEBUG_USART_APBxClkCmd(DEBUG_USART_CLK, ENABLE);
+    // 初始化对象参数
+    obj->USARTx = USARTx;
+    obj->baudrate = baudrate;
+    obj->interrupt = interrupt;
+    obj->ReCount = 0;
+    obj->Flag = 0;
 
-	// 将USART Tx的GPIO配置为推挽复用模式
-	GPIO_InitStructure.GPIO_Pin = DEBUG_USART_TX_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(DEBUG_USART_TX_GPIO_PORT, &GPIO_InitStructure);
+    // 时钟使能
+    if(hw_config->USART_CLK == RCC_APB2Periph_USART1) {
+        RCC_APB2PeriphClockCmd(hw_config->USART_CLK | hw_config->GPIO_CLK, ENABLE);
+    } else {
+        RCC_APB1PeriphClockCmd(hw_config->USART_CLK, ENABLE);
+        RCC_APB2PeriphClockCmd(hw_config->GPIO_CLK, ENABLE);
+    }
 
-  // 将USART Rx的GPIO配置为浮空输入模式
-	GPIO_InitStructure.GPIO_Pin = DEBUG_USART_RX_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(DEBUG_USART_RX_GPIO_PORT, &GPIO_InitStructure);
-	
+    // GPIO初始化
+    GPIO_Configuration(hw_config);
+
 	// 配置串口的工作参数
 	// 配置波特率
-	USART_InitStructure.USART_BaudRate = DEBUG_USART_BAUDRATE;
+	USART_InitStruct.USART_BaudRate = baudrate;
 	// 配置 针数据字长
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStruct.USART_WordLength = USART_WordLength_8b;
 	// 配置停止位
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStruct.USART_StopBits = USART_StopBits_1;
 	// 配置校验位
-	USART_InitStructure.USART_Parity = USART_Parity_No ;
+	USART_InitStruct.USART_Parity = USART_Parity_No ;
 	// 配置硬件流控制
-	USART_InitStructure.USART_HardwareFlowControl = 
+	USART_InitStruct.USART_HardwareFlowControl = 
 	USART_HardwareFlowControl_None;
 	// 配置工作模式，收发一起
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+	USART_InitStruct.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	// 完成串口的初始化配置
-	USART_Init(DEBUG_USARTx, &USART_InitStructure);
-	
-	// 串口中断优先级配置
-	NVIC_Configuration();
-	USART_ClearFlag(DEBUG_USARTx,USART_FLAG_RXNE);
+    USART_Init(USARTx, &USART_InitStruct);
+    if(interrupt) {
+        NVIC_Configuration(hw_config); // 应用优先级配置
+    }
+
+	USART_ClearFlag(USARTx,USART_FLAG_RXNE);
 	// 使能串口接收中断
-	USART_ITConfig(DEBUG_USARTx, USART_IT_RXNE, ENABLE);	
+	USART_ITConfig(USARTx, USART_IT_RXNE, ENABLE);	
 	
 	// 使能串口
-	USART_Cmd(DEBUG_USARTx, ENABLE);
-    USART_ITConfig(DEBUG_USARTx, USART_IT_IDLE, ENABLE);    
+	USART_Cmd(USARTx, ENABLE);
+    USART_ITConfig(USARTx, USART_IT_IDLE, ENABLE);    
 }
+void USART_IRQ_Handler(USART_Object* obj)
+{
+	u8 clear=clear;//这个变量用于清除IDLE中断，下面会做解释
+
+	USART_ClearFlag(obj->USARTx,USART_FLAG_TC);
+
+	if(USART_GetITStatus(obj->USARTx,USART_IT_RXNE)!=Bit_RESET)        
+	{
+		obj->Rebuff[obj->ReCount++]=obj->USARTx->DR;
+		USART_ClearITPendingBit(obj->USARTx, USART_IT_RXNE);
+	//通过接受中断，将发送的数据一个一个得存放在数组里		   
+	}
+	else if(USART_GetFlagStatus(obj->USARTx,USART_FLAG_IDLE) != Bit_RESET)
+	{//当我们发完了一帧数据后，该中断就会产生
+		clear=obj->USARTx->SR;
+		clear=obj->USARTx->DR;//这两行代码在作用上完全类似于   USART_ClearITPendingBit(USART1, USART_IT_RXNE);
+		//查看手册，对应寄存器可以知道，当我们依次读SR,DR寄存器之后，这个标志位就会自动清除。	
+		obj->Rebuff[obj->ReCount++] = '\0';
+		obj->Flag = 1;
+		if(obj->Process) obj->Process(obj->Rebuff, obj->ReCount);
+		Usart_SendArray(obj->USARTx,obj->Rebuff, obj->ReCount);
+		obj->ReCount=0;//这个为接收数据数组的计数数据，这里清零后，方便下一次接收数据
+		//如果没有这个清零，下次接收就会出问题，
+		//比如第一次我们接收了5个数据，分别对   rece_buffer的0  1  2  3  4  放了数据，当我们第二次接收数据，因为RxCounter
+		//并未清零，会继续给RxCounter的 5  6  7  .........赋值，如此会对我们的数据处理造成很大影响    
+		//printf ("---%s\r\n",Usart1_Receive.Rebuf);//此代码只是为了验证与转换后的结果相同          
+	}
+}   		
+
+void USART1_IRQHandler(void) { USART_IRQ_Handler(&USART1_Obj); }
+void USART2_IRQHandler(void) { USART_IRQ_Handler(&USART2_Obj); }
+void USART3_IRQHandler(void) { USART_IRQ_Handler(&USART3_Obj); }
 
 /*****************  发送一个字节 **********************/
 void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch)
@@ -93,12 +182,10 @@ void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch)
 void Usart_SendArray( USART_TypeDef * pUSARTx, uint8_t *array, uint16_t num)
 {
   uint8_t i;
-	
 	for(i=0; i<num; i++)
   {
 	    /* 发送一个字节数据到USART */
 	    Usart_SendByte(pUSARTx,array[i]);	
-  
   }
 	/* 等待发送完成 */
 	while(USART_GetFlagStatus(pUSARTx,USART_FLAG_TC)==RESET);
@@ -138,7 +225,7 @@ void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch)
 	while (USART_GetFlagStatus(pUSARTx, USART_FLAG_TXE) == RESET);	
 }
 
-///重定向c库函数printf到串口，重定向后可使用printf函数
+//重定向c库函数printf到串口，重定向后可使用printf函数
 int fputc(int ch, FILE *f)
 {
 		/* 发送一个字节数据到串口 */
@@ -150,7 +237,7 @@ int fputc(int ch, FILE *f)
 		return (ch);
 }
 
-///重定向c库函数scanf到串口，重写向后可使用scanf、getchar等函数
+//重定向c库函数scanf到串口，重写向后可使用scanf、getchar等函数
 int fgetc(FILE *f)
 {
 		/* 等待串口输入数据 */
@@ -158,34 +245,8 @@ int fgetc(FILE *f)
 
 		return (int)USART_ReceiveData(DEBUG_USARTx);
 }
-UsartStruct Usart1_Receive;
-//char  rece_buffer[54];
-//int RxCounter;
-void USART1_IRQHandler(void )
+void USART_RegisterCallback(USART_TypeDef* USARTx, USART_Callback callback)
 {
-  u8 clear=clear;//这个变量用于清除IDLE中断，下面会做解释
-
-	 USART_ClearFlag(USART1,USART_FLAG_TC);
-
-	 if(USART_GetITStatus(USART1,USART_IT_RXNE)!=Bit_RESET)        
-	   {
- 
-           Usart1_Receive.Rebuf[Usart1_Receive.ReBytes++]=USART1->DR;
-		   USART_ClearITPendingBit(USART1, USART_IT_RXNE);
-//通过接受中断，将发送的数据一个一个得存放在数组里		   
-	   }
-		 
-	 else if(USART_GetFlagStatus(USART1,USART_FLAG_IDLE)!=Bit_RESET)
-	  {//当我们发完了一帧数据后，该中断就会产生
-                clear=USART1->SR;
-                clear=USART1->DR;//这两行代码在作用上完全类似于   USART_ClearITPendingBit(USART1, USART_IT_RXNE);
-                //查看手册，对应寄存器可以知道，当我们依次读SR,DR寄存器之后，这个标志位就会自动清除。	
-          Usart1_Receive.Rebuf[Usart1_Receive.ReBytes++] = '\0';
-          Usart1_Receive.UsartFlag = 1;
-               Usart1_Receive.ReBytes=0;//这个为接收数据数组的计数数据，这里清零后，方便下一次接收数据
-               //如果没有这个清零，下次接收就会出问题，
-   //比如第一次我们接收了5个数据，分别对   rece_buffer的0  1  2  3  4  放了数据，当我们第二次接收数据，因为RxCounter
-   //并未清零，会继续给RxCounter的 5  6  7  .........赋值，如此会对我们的数据处理造成很大影响    
-//printf ("---%s\r\n",Usart1_Receive.Rebuf);//此代码只是为了验证与转换后的结果相同          
-      }
-      }   				
+    USART_Object* obj = GetUSARTObj(USARTx);
+    obj->Process = callback;
+}

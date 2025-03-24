@@ -1,4 +1,4 @@
-#include "SHW.h"
+#include "simple_module.h"
 #include "sys.h"
 #include "delay.h"
 
